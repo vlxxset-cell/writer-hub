@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Граф персонажей</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+  <script src="heroescom.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+  <div class="page-header">
+    <div>
+      <h1>🕸️ Граф персонажей</h1>
+      <p class="subtitle">Визуализация связей между персонажами. Hover подсвечивает связи; кликните по линии, чтобы удалить связь.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="communicates.html">← Выбор книги</a>
+    </div>
+  </div>
+
+  <div style="max-width:1200px; margin:16px auto;">
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+      <p class="subtitle" style="margin:0;">Кликните на связь, чтобы удалить её. После удаления появится окно отмены с таймером.</p>
+    </div>
+
+    <div id="network" style="height:560px; border:1px solid var(--color-border); border-radius:12px; background:var(--color-bg-primary);"></div>
+
+    <div style="margin-top:18px; border:1px solid var(--color-border); padding:12px; border-radius:12px; background:var(--color-bg-secondary);">
+      <h3>Добавить отношение</h3>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <div id="relPreview" style="width:320px;height:120px;border:1px dashed var(--color-border);border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;background:var(--color-bg-primary);margin-right:8px;">
+          <!-- preview will appear here -->
+          <span style="color:var(--color-muted)">Выберите персонажей и нажмите «Добавить отношение» для предпросмотра</span>
+        </div>
+        <select id="relSource"></select>
+        <select id="relTarget"></select>
+        <select id="relType"><option value="friend">Дружба</option><option value="love">Любовь</option><option value="enemy">Враги</option><option value="family">Семья</option><option value="neutral">Нейтрально</option></select>
+        <input id="relStrength" type="number" min="1" max="6" value="3" style="width:80px;" />
+        <input id="relChapter" placeholder="Глава (число)" style="width:140px;" />
+        <button id="addRelBtn" class="add-book-button">Добавить отношение</button>
+      </div>
+    </div>
+  </div>
+  <script src="transition.js" defer></script>
+</body>
+</html>

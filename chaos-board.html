@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writer Hub — Доска хаоса</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="theme.js" defer></script>
+  <script src="chaos-board.js" defer></script>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="home chaos-page">
+  <div class="page-header">
+    <div>
+      <h1>🔥 Доска хаоса</h1>
+      <p class="subtitle">Ни порядка, ни правил — просто добавляй, раскрашивай, перетаскивай, бросай всё как хочешь.</p>
+    </div>
+    <div class="page-actions">
+      <a class="open-btn" href="index.html">← На главную</a>
+    </div>
+  </div>
+
+  <div class="chaos-toolbar">
+    <div class="chaos-info-card">
+      <strong>Концепт</strong>
+      <p>Ничего не упорядочено. Можно бросать всё подряд. Можно двигать как хочешь. Вообще без давления структуры.</p>
+    </div>
+    <div class="chaos-controls">
+      <div class="palette-row">
+        <span>Выбери цвет:</span>
+        <div id="colorPalette" class="color-palette"></div>
+      </div>
+      <button id="addChaosNote" class="add-book-button">Добавить карточку</button>
+    </div>
+  </div>
+
+  <div id="chaosBoard" class="chaos-board" aria-label="Доска хаоса"></div>
+</div>
+</body>
+</html>

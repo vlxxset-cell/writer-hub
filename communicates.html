@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Граф персонажей — выбор книги</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="communicates.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+  <div class="page-header">
+    <div>
+      <h1>🕸️ Граф персонажей</h1>
+      <p class="subtitle">Выберите книгу — затем создайте или просмотрите граф связей персонажей.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← Главное</a>
+    </div>
+  </div>
+
+  <div class="checker-page">
+    <div id="booksList" class="books-grid"></div>
+  </div>
+  <script src="transition.js" defer></script>
+</body>
+</html>

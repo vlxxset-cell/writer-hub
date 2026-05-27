@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Читательский дневник</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="reader.js" defer></script>
+  <script src="transition.js" defer></script>
+</head>
+
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="books">
+  <div class="page-header">
+    <div>
+      <h1>📖 Читательский дневник</h1>
+        <p class="subtitle">Оцени прочитанные книги, запиши эмоции и впечатления и сохрани отзыв в дневник.</p>
+      </div>
+    </div>
+
+    <div class="create-box reader-box">
+      <h2>Новый отзыв</h2>
+      <input id="reviewTitle" type="text" placeholder="Название книги" autocomplete="off">
+      <input id="reviewAuthor" type="text" placeholder="Автор">
+
+      <div class="cover-rating-row">
+        <div class="cover-upload-panel">
+          <label class="cover-upload-label" for="coverInput">Обложка книги</label>
+          <input id="coverInput" type="file" accept="image/*">
+          <div id="coverPreview" class="cover-preview">Здесь будет обложка</div>
+        </div>
+
+        <div class="rating-groups">
+          <div class="rating-group">
+            <div class="rating-category-label">Эмоции</div>
+            <div class="rating-stars" data-category="emotions" aria-label="Оценка эмоций">
+              <button type="button" class="star-btn" data-value="1">★</button>
+              <button type="button" class="star-btn" data-value="2">★</button>
+              <button type="button" class="star-btn" data-value="3">★</button>
+              <button type="button" class="star-btn" data-value="4">★</button>
+              <button type="button" class="star-btn" data-value="5">★</button>
+            </div>
+          </div>
+          <div class="rating-group">
+            <div class="rating-category-label">Сюжет</div>
+            <div class="rating-stars" data-category="plot" aria-label="Оценка сюжета">
+              <button type="button" class="star-btn" data-value="1">★</button>
+              <button type="button" class="star-btn" data-value="2">★</button>
+              <button type="button" class="star-btn" data-value="3">★</button>
+              <button type="button" class="star-btn" data-value="4">★</button>
+              <button type="button" class="star-btn" data-value="5">★</button>
+            </div>
+          </div>
+          <div class="rating-group">
+            <div class="rating-category-label">Персонажи</div>
+            <div class="rating-stars" data-category="characters" aria-label="Оценка персонажей">
+              <button type="button" class="star-btn" data-value="1">★</button>
+              <button type="button" class="star-btn" data-value="2">★</button>
+              <button type="button" class="star-btn" data-value="3">★</button>
+              <button type="button" class="star-btn" data-value="4">★</button>
+              <button type="button" class="star-btn" data-value="5">★</button>
+            </div>
+          </div>
+          <div class="rating-group">
+            <div class="rating-category-label">Авторский язык</div>
+            <div class="rating-stars" data-category="language" aria-label="Оценка авторского языка">
+              <button type="button" class="star-btn" data-value="1">★</button>
+              <button type="button" class="star-btn" data-value="2">★</button>
+              <button type="button" class="star-btn" data-value="3">★</button>
+              <button type="button" class="star-btn" data-value="4">★</button>
+              <button type="button" class="star-btn" data-value="5">★</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <textarea id="reviewEmotions" placeholder="Расскажи, какие эмоции вызвала книга..." rows="6"></textarea>
+      <button id="saveReviewBtn" class="add-book-button">Сохранить отзыв</button>
+    </div>
+
+  <div class="review-summary">
+    <h2>Сохранённые отзывы</h2>
+    <div id="savedReviews" class="review-list"></div>
+  </div>
+</div>
+
+<div id="undoToast" class="undo-toast" aria-live="polite">
+  <span id="undoMessage">Отзыв будет удалён...</span>
+  <button id="undoCancelBtn" type="button">Отмена</button>
+  <div class="undo-progress">
+    <div id="undoProgressBar" class="undo-progress__bar"></div>
+  </div>
+</div>
+
+</body>
+</html>

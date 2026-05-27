@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writer Hub - Твой Творческий Помощник</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="index.js" defer></script>
+  <script src="transition.js" defer></script>
+</head>
+
+<body>
+
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="auth-panel">
+  <div id="welcomeUser" style="display:none; font-size: 0.85rem; color: var(--color-primary); font-weight: 600; margin-bottom: 8px;"></div>
+  
+  <div id="authButtons" style="display:none; gap:8px; flex-direction:column;">
+    <button id="loginToggleBtn" style="width:100%;">Вход</button>
+    <button id="regToggleBtn" style="width:100%;">Регистрация</button>
+  </div>
+
+  <form id="loginForm" style="display:none;" class="auth-form">
+    <h3>Вход</h3>
+    <input id="loginUser" placeholder="Имя" />
+    <input id="loginPass" type="password" placeholder="Пароль" />
+    <button type="submit">Войти</button>
+    <button type="button" id="showRegisterBtn" style="margin-top: 10px; width: 100%;">Регистрация</button>
+  </form>
+
+  <form id="registerForm" style="display:none;" class="auth-form">
+    <h3>Регистрация</h3>
+    <input id="regUser" placeholder="Имя" />
+    <input id="regPass" type="password" placeholder="Пароль" />
+    <button type="submit">Создать</button>
+  </form>
+
+  <button id="logoutBtn" style="display:none;">Выйти</button>
+  <button id="syncAccountBtn" style="display:none; width:100%; margin-top:8px; font-size:0.85rem;">Экспорт аккаунта</button>
+  <button id="importAccountBtn" style="width:100%; margin-top:8px; font-size:0.85rem;">Импорт аккаунта</button>
+  <input id="importFile" type="file" accept="application/json" style="display:none" />
+</div>
+
+<div class="home">
+  <h1>📖 Writer Hub</h1>
+  <p>Полнофункциональная система для создания, редактирования и анализа творческих произведений</p>
+
+  <div class="grid">
+    <a class="card" href="books.html"><span>📚 Книги</span></a>
+    <a class="card" href="notes.html"><span>📝 Заметки</span></a>
+    <a class="card" href="reader.html"><span>📖 Читательский дневник</span></a>
+    <a class="card" href="chaos-board.html"><span>🔥 Доска хаоса</span></a>
+      <a class="card" href="writing-calendar.html"><span>📅 Writing Calendar</span></a>
+    <a class="card" href="visual.html"><span>📊 Визуал</span></a>
+    <a class="card" href="effect.html"><span>⚡ Эффекты</span></a>
+    <a class="card" href="ai-checker.html"><span>🧠 AI Проверка</span></a>
+    <a class="card" href="mood.html"><span>🎭 Настроение сцены</span></a>
+    <a class="card" href="communicates.html"><span>🕸️ Граф персонажей</span></a>
+  </div>
+</div>
+
+</body>
+</html>

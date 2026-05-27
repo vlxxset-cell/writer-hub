@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Персонажи</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="book-page">
+  <p class="subtitle" id="bookSubtitle">Книга</p>
+
+  <div class="book-header">
+    <h1 id="pageTitle">Персонажи</h1>
+  </div>
+
+  <div class="editor-block">
+    <h2>Персонажи</h2>
+
+    <div class="editor-meta">
+      <div class="meta-row">
+        <div class="meta-item save-status" id="saveStatus">Сохранено</div>
+      </div>
+      <div class="toolbar">
+        <button id="addHeroBtn" class="quick-btn" type="button">Добавить персонажа</button>
+        <button id="clearHeroesBtn" type="button">Очистить</button>
+      </div>
+    </div>
+
+    <div id="heroesList" class="heroes-grid"></div>
+    <div id="undoToast" class="undo-toast" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="heroes.js"></script>  <script src="transition.js" defer></script></body>
+</html>

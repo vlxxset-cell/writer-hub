@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Книга</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="book-page">
+    <div class="page-header">
+      <div>
+        <h1 id="bookTitle" contenteditable="true"></h1>
+        <p class="subtitle">Редактируй название, меняй обложку и запускай нужные разделы одним кликом.</p>
+      </div>
+      <div class="page-actions">
+        <a class="card small-card" href="books.html">← все книги</a>
+      </div>
+    </div>
+
+    <div class="book-header">
+      <div id="coverPreview"></div>
+      <div class="cover-controls">
+        <label class="upload-btn">
+          📷 выбрать обложку
+          <input type="file" id="coverPicker" accept="image/*">
+        </label>
+        <button id="removeCoverBtn" onclick="removeCover()" style="display:none">удалить</button>
+      </div>
+    </div>
+
+    <div class="grid">
+    <a class="card" href="chapter.html">📚 главы</a>
+    <a class="card" href="chronology.html">⏳ хронология</a>
+    <a class="card" href="heroes.html">👤 персонажи</a>
+    <a class="card" href="plot.html">🧠 сюжет</a>
+
+  </div>
+
+</div>
+
+<script src="book.js"></script>
+<script src="transition.js" defer></script>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg">
+</div>
+
+<div id="coverUndoToast" class="undo-toast" aria-live="polite"></div>
+
+</body>
+</html>

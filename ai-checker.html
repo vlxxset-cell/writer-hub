@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Consistency Checker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="ai-checker.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <div class="page-header">
+    <div>
+      <h1>🧠 AI Consistency Checker</h1>
+      <p class="subtitle">Быстрый обзор конфликтов, повторов и сюжетных рассинхронизаций между сценами, персонажами и фактами.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← Главное</a>
+    </div>
+  </div>
+
+  <div class="checker-page">
+    <div class="checker-toolbar">
+      <textarea id="storyInput" rows="8" placeholder="Вставьте отрывок своего произведения для проверки..."></textarea>
+      <button id="runCheckBtn" class="add-book-button" type="button" disabled>Проверка</button>
+    </div>
+
+    <div class="checker-summary">
+      <div><strong id="countTotal">0</strong> конфликтов обнаружено</div>
+      <div><strong id="countCritical">0</strong> критично · <strong id="countWarning">0</strong> предупреждений</div>
+    </div>
+
+    <div class="checker-toolbar secondary-toolbar">
+      <input id="conflictSearch" placeholder="Поиск по результатам проверки..." />
+      <div class="severity-filters">
+        <button type="button" data-severity="all" class="active">Все</button>
+        <button type="button" data-severity="critical">Критично</button>
+        <button type="button" data-severity="warning">Предупреждение</button>
+        <button type="button" data-severity="note">Совет</button>
+      </div>
+    </div>
+
+    <div class="conflict-grid" id="conflictGrid"></div>
+    <div class="no-results" id="noResults">Введите текст и нажмите «Проверка», чтобы получить результаты.</div>
+  </div>
+  <script src="transition.js" defer></script>
+</body>
+</html>

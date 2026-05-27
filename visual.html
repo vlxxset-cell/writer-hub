@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуал</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="visual.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <div class="page-header">
+    <div>
+      <h1>📊 Визуал</h1>
+      <p class="subtitle">Преобрази сюжет в цвет, ритм и атмосферу.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← главное</a>
+    </div>
+  </div>
+
+
+  <div class="visual-panel">
+    <div class="visual-actions">
+      <select id="mediaType">
+        <option value="photo">Фото</option>
+        <option value="music">Музыка</option>
+        <option value="video">Видео</option>
+      </select>
+      <input id="mediaTitle" placeholder="Название медиа" />
+      <label class="upload-btn" id="mediaFileLabel">
+        <span id="mediaFileLabelText">Выберите файл</span>
+        <input type="file" id="mediaFileInput" accept="image/*" />
+      </label>
+      <button id="addMediaBtn" class="add-book-button" type="button">Добавить на доску</button>
+    </div>
+    <div class="visual-board" id="visualBoard"></div>
+  </div>
+  <script src="transition.js" defer></script>
+</body>
+</html>

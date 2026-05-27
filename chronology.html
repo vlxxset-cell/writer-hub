@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Хронология</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="book-page">
+  <p class="subtitle" id="bookSubtitle">Книга</p>
+
+  <div class="book-header">
+    <h1 id="pageTitle">Хронология</h1>
+  </div>
+
+  <div class="editor-block">
+    <h2>Хронология событий</h2>
+
+    <div class="editor-meta">
+      <div class="meta-row">
+        <div class="meta-item save-status" id="saveStatus">Сохранено</div>
+      </div>
+      <div class="toolbar">
+        <button id="addTimelineBtn" class="quick-btn" type="button">Добавить событие</button>
+        <button id="clearTimelineBtn" type="button">Очистить</button>
+        <button id="copyTimelineBtn" type="button">Скопировать</button>
+      </div>
+    </div>
+
+    <div id="timelineList" class="timeline-list"></div>
+    <div id="undoToast" class="undo-toast" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="chronology.js"></script>
+  <script src="transition.js" defer></script>
+</html>

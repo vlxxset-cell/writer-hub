@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Сюжет</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="book-page">
+  <p class="subtitle" id="bookSubtitle">Книга</p>
+
+  <div class="book-header">
+    <h1 id="pageTitle">Сюжет</h1>
+  </div>
+
+  <div class="editor-block">
+    <h2>Сюжет</h2>
+
+    <div class="editor-meta">
+      <div class="meta-row">
+        <div class="meta-item save-status" id="saveStatus">Сохранено</div>
+      </div>
+      <div class="toolbar">
+        <button id="addTwistBtn" class="quick-btn" type="button">Добавить поворот</button>
+        <button id="clearTwistsBtn" type="button">Очистить все</button>
+      </div>
+    </div>
+
+    <textarea id="plotSummary" placeholder="Опиши основной сюжет книги..."></textarea>
+
+    <div class="section-title">Сюжетные повороты</div>
+    <div id="twistsList" class="twists-list"></div>
+    <div id="undoToast" class="undo-toast" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="plot.js"></script>
+  <script src="transition.js" defer></script>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Книги</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="books">
+  <div class="page-header">
+    <div>
+      <h1>📚 Книги</h1>
+      <p class="subtitle">Коллекция твоих историй, готовая к правкам и новым главам.</p>
+    </div>
+    <div class="page-actions">
+      <button class="add-book-button" onclick="showAddModal()">Добавить книгу</button>
+    </div>
+  </div>
+
+  <div class="create-box">
+    <input id="searchBooks" placeholder="Поиск по названию или жанру..." type="search">
+  </div>
+
+  <div id="booksList" class="books-grid"></div>
+</div>
+
+<script src="books.js"></script>  <script src="transition.js" defer></script>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-card">
+
+    <p id="modalText">Какую книгу вы хотите добавить?</p>
+    <input id="newBookTitle" type="text" placeholder="Введите название книги" autofocus>
+    <div class="genre-field">
+      <label for="genreSelect">Жанр</label>
+      <select id="genreSelect">
+        <option value="Фэнтези">Фэнтези</option>
+        <option value="Фантастика">Фантастика</option>
+        <option value="Любовный роман">Любовный роман</option>
+        <option value="Детектив">Детектив</option>
+        <option value="Триллер">Триллер</option>
+        <option value="Проза">Проза</option>
+        <option value="Комедия">Комедия</option>
+      </select>
+    </div>
+    <div class="modal-buttons">
+      <button onclick="closeModal()">Отмена</button>
+      <button id="modalActionBtn" onclick="confirmCreate()">Создать</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="undoToast" class="undo-toast" aria-live="polite"></div>
+</body>
+</html>

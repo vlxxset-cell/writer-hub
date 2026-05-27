@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Настроение сцены</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="mood.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <div class="page-header">
+    <div>
+      <h1>🎭 Настроение сцены</h1>
+      <p class="subtitle">Вставьте сцену и нажмите «Узнать настроение», чтобы получить визуализацию эмоций.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← Главное</a>
+    </div>
+  </div>
+
+  <div class="checker-page">
+    <div class="checker-toolbar">
+      <textarea id="sceneInput" rows="10" placeholder="Вставьте сцену..."></textarea>
+      <button id="analyzeMoodBtn" class="add-book-button" type="button" disabled>Узнать настроение</button>
+    </div>
+
+    <div style="max-width:900px; margin:24px auto;">
+      <canvas id="moodChart" height="160"></canvas>
+    </div>
+    <div id="moodAdvice" style="max-width:900px; margin:12px auto; color:var(--color-text-secondary);"></div>
+  </div>
+  <script src="transition.js" defer></script>
+</body>
+</html>

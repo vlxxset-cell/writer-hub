@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Редактор главы</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
+<div class="book-page editor-page">
+  <div class="page-header">
+    <div>
+      <h1 id="chapterTitle">глава</h1>
+      <p class="subtitle">Почувствуй структуру и собери события в красивую главу.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="chapter.html">← главы</a>
+    </div>
+  </div>
+
+  <!-- Краткое содержание -->
+  <div class="editor-block">
+    <h2>Краткое содержание</h2>
+
+    <textarea
+      id="chapterSummary"
+      placeholder="Опиши кратко, что происходит в этой главе..."
+    ></textarea>
+  </div>
+
+  <!-- События -->
+  <div class="editor-block">
+
+    <div class="events-top">
+      <h2>События</h2>
+
+      <button id="addEventBtn" class="add-event-btn">
+        + новое событие
+      </button>
+    </div>
+
+    <div id="eventsList" class="events-list"></div>
+
+    <div id="undoToast" class="undo-toast" aria-live="polite"></div>
+  </div>
+
+</div>
+
+<script src="editor.js"></script>  <script src="transition.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Главы</title>
+	<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+	<script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="undo.js"></script>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle">🌙</button>
+  <div class="page-header">
+    <div>
+      <p class="subtitle" id="bookSubtitle">Книга</p>
+      <h1 id="pageTitle">Главы</h1>
+    </div>
+    <div class="page-actions">
+      <button id="addChapterBtn" class="add-book-button">Добавить главу</button>
+    </div>
+  </div>
+
+  <div class="create-box">
+    <input id="newChapterTitle" placeholder="Название новой главы" aria-label="Название новой главы">
+  </div>
+
+	<div id="chaptersContainer">
+		<ul id="chapters" class="books-grid"></ul>
+		<p id="emptyMessage" style="color:#64748b; margin-top:12px;">Пока нет ни одной главы. Нажмите «Добавить главу», чтобы создать первую.</p>
+	</div>
+
+	<div id="undoToast" class="undo-toast" aria-live="polite"></div>
+
+</div>
+
+<script src="chapter.js"></script>  <script src="transition.js" defer></script></body>
+</html>

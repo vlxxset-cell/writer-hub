@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing Calendar</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="writing-calendar.js" defer></script>
+  <script src="transition.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <div class="page-header">
+    <div>
+      <h1>📅 Writing Calendar</h1>
+      <p class="subtitle">Отслеживай дни письма, слова и ритм работы в стиле «графа вкладов».</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← главное</a>
+    </div>
+  </div>
+
+  <div class="calendar-dashboard">
+    <div class="calendar-summary">
+      <div class="stat-box">
+        <span>Последняя запись</span>
+        <strong id="lastSession">—</strong>
+      </div>
+      <div class="stat-box">
+        <span>Текущий стрик</span>
+        <strong id="currentStreak">0</strong>
+      </div>
+      <div class="stat-box">
+        <span>Лучшая неделя</span>
+        <strong id="bestWeek">—</strong>
+      </div>
+      <div class="stat-box">
+        <span>Месяц активности</span>
+        <strong id="activeMonth">—</strong>
+      </div>
+    </div>
+
+    <section class="calendar-panel">
+      <div class="calendar-controls">
+        <div>
+          <label for="entryDate">Дата</label>
+          <input id="entryDate" type="date" />
+        </div>
+        <div>
+          <label for="entryWords">Слов</label>
+          <input id="entryWords" type="number" min="0" step="10" placeholder="0" />
+        </div>
+        <div>
+          <label for="entryMinutes">Минут</label>
+          <input id="entryMinutes" type="number" min="0" step="5" placeholder="0" />
+        </div>
+        <div>
+          <label for="entryIntensity">Интенсивность</label>
+          <select id="entryIntensity">
+            <option value="0">—</option>
+            <option value="1">Легко</option>
+            <option value="2">Средне</option>
+            <option value="3">Серьёзно</option>
+            <option value="4">Прорыв</option>
+          </select>
+        </div>
+        <div class="calendar-actions">
+          <button id="saveEntryBtn" class="add-book-button" type="button">Сохранить день</button>
+          <button id="deleteEntryBtn" class="delete-btn" type="button">Удалить день</button>
+          <button id="clearCalendarBtn" class="delete-btn" type="button">Очистить</button>
+        </div>
+      </div>
+
+      <div class="calendar-meta">
+        <div class="month-card">
+          <div class="month-card-header">
+            <h2>Граф активности</h2>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button id="prevMonthBtn" class="open-btn" type="button">‹</button>
+              <span id="monthLabel">—</span>
+              <button id="nextMonthBtn" class="open-btn" type="button">›</button>
+            </div>
+          </div>
+          <div id="activityHeatmap" class="activity-heatmap"></div>
+        </div>
+
+        <div class="month-report">
+          <div class="report-row">
+            <div>
+              <span>Записей за месяц</span>
+              <strong id="monthEntries">0</strong>
+            </div>
+            <div>
+              <span>Всего слов</span>
+              <strong id="monthWords">0</strong>
+            </div>
+          </div>
+          <div class="report-row">
+            <div>
+              <span>Средняя интенсивность</span>
+              <strong id="avgIntensity">0</strong>
+            </div>
+            <div>
+              <span>Лучший день</span>
+              <strong id="bestDay">—</strong>
+            </div>
+          </div>
+          <div class="report-row">
+            <div>
+              <span>Самый продуктивный день</span>
+              <strong id="bestWordsDay">—</strong>
+            </div>
+            <div>
+              <span>Самый долгий сеанс</span>
+              <strong id="bestMinutesDay">—</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="undo-toast" id="calendarUndoToast" aria-live="polite">
+    <div id="undoMessage">Действие выполнено</div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button id="undoBtn">Отменить</button>
+    </div>
+    <div class="undo-progress"><div id="undoProgressBar" class="undo-progress__bar"></div></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Заметки</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="notes.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <div class="page-header">
+    <div>
+      <h1>📝 Заметки</h1>
+      <p class="subtitle">Интерактивная доска идей и заготовок для ваших сюжетов.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← главное</a>
+    </div>
+  </div>
+
+  <div class="notes-panel">
+    <div class="create-box">
+      <input id="noteTitleInput" placeholder="Название заметки" />
+      <textarea id="noteTextInput" rows="5" placeholder="Пиши идею, цитату или заметку"></textarea>
+      <div class="note-actions">
+        <button id="addNoteBtn" class="add-book-button" type="button">Добавить заметку</button>
+        <button id="randomIdeaBtn" class="delete-btn" type="button">Случайная идея</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes-board" id="notesBoard"></div>
+  <script src="transition.js" defer></script>
+</body>
+</html>
