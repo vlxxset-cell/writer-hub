@@ -53,16 +53,46 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const reader = new FileReader();
+    // resize before storing to avoid quota exceeded on mobile photos
+    (async () => {
+      try {
+        const small = await (function resizeImageFile(file, maxWidth = 1200, quality = 0.8) {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            const reader = new FileReader();
+            reader.onload = () => {
+              img.onload = () => {
+                const ratio = img.width / img.height;
+                let w = img.width; let h = img.height;
+                if (w > maxWidth) { w = maxWidth; h = Math.round(maxWidth / ratio); }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                try { resolve(canvas.toDataURL('image/jpeg', quality)); } catch (e) { reject(e); }
+              };
+              img.onerror = reject;
+              img.src = reader.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        })(file);
 
-    reader.onload = () => {
-      book.cover = reader.result;
-      books[index] = book;
-      localStorage.setItem("books", JSON.stringify(books));
-      renderCover();
-    };
-
-    reader.readAsDataURL(file);
+        book.cover = small;
+        books[index] = book;
+        try {
+          localStorage.setItem("books", JSON.stringify(books));
+          renderCover();
+        } catch (err) {
+          console.error('save cover error', err);
+          alert('Хранилище переполнено. Обложка слишком большая. Попробуйте выбрать более маленькое изображение.');
+        }
+      } catch (err) {
+        console.error('resize cover error', err);
+        alert('Не удалось обработать выбранный файл.');
+      }
+    })();
   });
 
   function removeCover() {

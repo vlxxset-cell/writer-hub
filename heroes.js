@@ -34,8 +34,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function save() {
     books[index] = book;
-    localStorage.setItem("books", JSON.stringify(books));
-    saveStatus.innerText = "Сохранено";
+    try {
+      localStorage.setItem("books", JSON.stringify(books));
+      saveStatus.innerText = "Сохранено";
+    } catch (err) {
+      console.error('save error', err);
+      if (err && err.name === 'QuotaExceededError') {
+        alert('Хранилище переполнено. Изображение слишком большое — попробуйте выбрать другое или уменьшить фото.');
+      } else {
+        alert('Ошибка при сохранении: ' + (err && err.message));
+      }
+    }
+  }
+
+  // Resize image file to a reasonable size to avoid localStorage quota issues
+  function resizeImageFile(file, maxWidth = 1000, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = () => {
+        img.onload = () => {
+          const ratio = img.width / img.height;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxWidth) { w = maxWidth; h = Math.round(maxWidth / ratio); }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          try {
+            const out = canvas.toDataURL('image/jpeg', quality);
+            resolve(out);
+          } catch (e) { reject(e); }
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   // --- helpers for computing subtle card color based on optimism slider ---
@@ -237,18 +274,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     avatar.addEventListener('click', () => photoInput.click());
 
-    photoInput.addEventListener("change", (event) => {
+    photoInput.addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
+      if (!file.type.startsWith('image/')) return alert('Выберите изображение');
+      try {
+        const smallData = await resizeImageFile(file, 900, 0.75);
         book.heroes[position] = book.heroes[position] || {};
-        book.heroes[position].photo = reader.result;
-        avatar.style.backgroundImage = `url('${reader.result}')`;
+        book.heroes[position].photo = smallData;
+        avatar.style.backgroundImage = `url('${smallData}')`;
         avatar.textContent = "";
         save();
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('photo resize/save error', err);
+        alert('Не удалось обработать изображение. Попробуйте другое фото.');
+      }
     });
 
     // save without generating heavy canvas image (just mark as summary view)
