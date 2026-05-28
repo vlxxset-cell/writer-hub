@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   const idx = Number(localStorage.getItem('currentBookGraph'));
-  const books = JSON.parse(localStorage.getItem('books')) || [];
+  let books = JSON.parse(localStorage.getItem('books')) || [];
   if (isNaN(idx) || !books[idx]) { window.location.href = 'books.html'; return; }
-  const book = books[idx];
+  let book = books[idx];
 
   const relSource = document.getElementById('relSource');
   const relTarget = document.getElementById('relTarget');
@@ -16,6 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
   book.relations = book.relations || [];
 
   function save() { books[idx] = book; localStorage.setItem('books', JSON.stringify(books)); }
+
+  function loadLatestBook() {
+    const latest = JSON.parse(localStorage.getItem('books') || '[]');
+    if (!Array.isArray(latest) || !latest[idx]) return false;
+    books = latest;
+    book = books[idx];
+    book.heroes = book.heroes || [];
+    book.relations = book.relations || [];
+    return true;
+  }
 
   // build nodes helper
   function makeNode(h, i) {
@@ -136,6 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
       addRelBtn.disabled = true;
     } else {
       addRelBtn.disabled = false;
+      if (relSource.selectedIndex === -1) relSource.selectedIndex = 0;
+      if (relTarget.selectedIndex === -1) relTarget.selectedIndex = book.heroes.length > 1 ? 1 : 0;
+      if (relSource.value === relTarget.value && book.heroes.length > 1) relTarget.selectedIndex = 1;
     }
   }
 
@@ -158,16 +171,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // listen for localStorage changes (other tabs/windows)
   window.addEventListener('storage', (e) => {
     if (e.key === 'books') {
-      try {
-        const all = JSON.parse(e.newValue || '[]');
-        if (Array.isArray(all) && all[idx]) {
-          // update local book reference
-          book.heroes = all[idx].heroes || [];
-          book.relations = all[idx].relations || [];
-          refreshNodes();
-          refreshEdges();
-        }
-      } catch (err) { /* ignore parse errors */ }
+      if (loadLatestBook()) {
+        refreshNodes();
+        refreshEdges();
+      }
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    if (loadLatestBook()) {
+      refreshNodes();
+      refreshEdges();
     }
   });
 
@@ -253,6 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   addRelBtn.addEventListener('click', () => {
+    loadLatestBook();
     const from = Number(relSource.value);
     const to = Number(relTarget.value);
     if (isNaN(from) || isNaN(to) || from===to) return alert('Выберите двух разных персонажей');

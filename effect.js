@@ -32,6 +32,51 @@ document.addEventListener('DOMContentLoaded', () => {
     saveDraft();
   }
 
+  const idleNotification = document.getElementById('idleNotification');
+  let idleWarningTimer = null;
+  let idleDeleteTimer = null;
+
+  function hideIdleNotification() {
+    if (!idleNotification) return;
+    idleNotification.textContent = '';
+    idleNotification.classList.remove('visible');
+  }
+
+  function showIdleWarning() {
+    if (!idleNotification) return;
+    idleNotification.textContent = 'Если вы не напишете что-то в течение минуты, текст будет удалён.';
+    idleNotification.classList.add('visible');
+  }
+
+  function clearIdleTimers() {
+    clearTimeout(idleWarningTimer);
+    clearTimeout(idleDeleteTimer);
+    idleWarningTimer = null;
+    idleDeleteTimer = null;
+  }
+
+  function scheduleIdleTimers() {
+    clearIdleTimers();
+    idleWarningTimer = setTimeout(() => {
+      showIdleWarning();
+      idleDeleteTimer = setTimeout(() => {
+        if (focusText.innerText.trim().length > 0) {
+          focusText.innerHTML = '';
+          updateMetrics();
+          hideIdleNotification();
+        }
+      }, 60_000);
+    }, 120_000);
+  }
+
+  function resetIdleTimers() {
+    hideIdleNotification();
+    clearIdleTimers();
+    if (focusText.innerText.trim().length > 0) {
+      scheduleIdleTimers();
+    }
+  }
+
   function formatTime(seconds) {
     const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
     const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
@@ -81,8 +126,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  focusText.addEventListener('input', updateMetrics);
-  focusText.addEventListener('focus', () => focusText.classList.add('focus-active'));
+  focusText.addEventListener('input', () => {
+    updateMetrics();
+    resetIdleTimers();
+  });
+  focusText.addEventListener('keydown', resetIdleTimers);
+  focusText.addEventListener('focus', () => {
+    focusText.classList.add('focus-active');
+    if (focusText.innerText.trim().length > 0) {
+      scheduleIdleTimers();
+    }
+  });
   focusText.addEventListener('blur', () => focusText.classList.remove('focus-active'));
 
   startBtn.addEventListener('click', startTimer);
