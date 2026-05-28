@@ -60,28 +60,21 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     const input = item.querySelector(".event-input");
-    const buttons = item.querySelectorAll(".priority-btn");
+    const buttons = Array.from(item.querySelectorAll(".priority-btn"));
     const deleteBtn = item.querySelector(".delete-event-btn");
 
     function update() {
       const idx = chapter.events.findIndex(e => e.id === id);
-
-      const updated = {
-        id,
-        text: input.value,
-        priority: item.querySelector(".priority-btn.active")?.dataset.value || "low"
-      };
-
+      const priority = item.querySelector(".priority-btn.active")?.dataset.value || "low";
       if (idx >= 0) {
-        chapter.events[idx] = updated;
+        chapter.events[idx].text = input.value;
+        chapter.events[idx].priority = priority;
       } else {
-        chapter.events.push(updated);
+        chapter.events.push({ id, text: input.value, priority });
       }
 
-      item.className = `event-item priority-${updated.priority}`;
-
+      item.className = `event-item priority-${priority}`;
       save();
-      sortEvents();
     }
 
     deleteBtn.addEventListener("click", () => {
@@ -102,9 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("input", update);
 
     buttons.forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (event) => {
         buttons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+        const target = event.currentTarget;
+        target.classList.add("active");
         update();
         render();
       });

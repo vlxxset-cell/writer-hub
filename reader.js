@@ -29,8 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return JSON.parse(localStorage.getItem(reviewStorageKey) || '[]');
   }
 
+  function isQuotaExceeded(error) {
+    return error && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED' || error.code === 22 || error.code === 1014);
+  }
+
   function saveReviews(reviews) {
-    localStorage.setItem(reviewStorageKey, JSON.stringify(reviews));
+    try {
+      localStorage.setItem(reviewStorageKey, JSON.stringify(reviews));
+    } catch (err) {
+      if (isQuotaExceeded(err)) {
+        throw new DOMException('Quota exceeded', 'QuotaExceededError');
+      }
+      throw err;
+    }
   }
 
   function setCategoryRating(category, value) {
@@ -108,7 +119,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  coverInput.addEventListener('change', (event) => {
+  function resizeImageFile(file, maxWidth = 900, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const ratio = img.width / img.height;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            width = maxWidth;
+            height = Math.round(maxWidth / ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          try {
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  coverInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) {
       coverData = null;
@@ -122,13 +165,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      coverData = reader.result;
+    try {
+      coverData = await resizeImageFile(file, 900, 0.75);
       coverPreview.style.backgroundImage = `url('${coverData}')`;
       coverPreview.textContent = '';
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('image resize error', err);
+      alert('Не удалось загрузить изображение. Попробуйте файл поменьше.');
+      coverData = null;
+      coverPreview.style.backgroundImage = 'none';
+      coverPreview.textContent = 'Здесь будет обложка';
+      coverInput.value = '';
+    }
   });
 
   saveButton.addEventListener('click', () => {

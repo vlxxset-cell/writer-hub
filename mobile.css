@@ -108,3 +108,21 @@ input, textarea, select { width: 100%; }
   h1 { font-size: 1.6rem; }
   h2 { font-size: 1.1rem; }
 }
+
+.chaos-board {
+  min-height: 66vh !important;
+  max-height: 74vh;
+  overflow: auto !important;
+  padding: 16px;
+}
+
+.chaos-note {
+  max-width: calc(100% - 32px) !important;
+  width: auto !important;
+  touch-action: none;
+}
+
+.chaos-note .note-content {
+  min-height: 120px;
+}
+

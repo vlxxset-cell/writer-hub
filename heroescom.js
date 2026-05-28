@@ -106,10 +106,37 @@ document.addEventListener('DOMContentLoaded', () => {
   function populateSelectors() {
     relSource.innerHTML = '';
     relTarget.innerHTML = '';
-    book.heroes.forEach((h,i)=>{
-      const opt = document.createElement('option'); opt.value = i; opt.textContent = h.name || `Персонаж ${i+1}`;
-      relSource.appendChild(opt.cloneNode(true)); relTarget.appendChild(opt);
+
+    if (!book.heroes.length) {
+      const placeholder = document.createElement('option');
+      placeholder.textContent = 'Добавьте персонажей на странице «Персонажи»';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      relSource.appendChild(placeholder.cloneNode(true));
+      relTarget.appendChild(placeholder);
+      addRelBtn.disabled = true;
+      return;
+    }
+
+    book.heroes.forEach((h, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = h.name || `Персонаж ${i+1}`;
+      relSource.appendChild(opt.cloneNode(true));
+      relTarget.appendChild(opt);
     });
+
+    if (book.heroes.length < 2) {
+      const placeholder = document.createElement('option');
+      placeholder.textContent = 'Нужно минимум 2 персонажа';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      relSource.insertBefore(placeholder.cloneNode(true), relSource.firstChild);
+      relTarget.insertBefore(placeholder, relTarget.firstChild);
+      addRelBtn.disabled = true;
+    } else {
+      addRelBtn.disabled = false;
+    }
   }
 
   populateSelectors();
