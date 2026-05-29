@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function notifyUserChanged() {
+    window.dispatchEvent(new Event('writer-user-changed'));
+  }
+
   loginToggleBtn.addEventListener('click', () => {
     authButtons.style.display = 'none';
     loginForm.style.display = 'flex';
@@ -69,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!users[user] || users[user] !== hash) return alert('Неверный пользователь или пароль');
     localStorage.setItem('writer_user', user);
     showWelcome();
+    notifyUserChanged();
     alert('Успешный вход');
   });
 
@@ -84,12 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
     saveUsers(users);
     localStorage.setItem('writer_user', user);
     showWelcome();
+    notifyUserChanged();
     alert('Пользователь создан и вы вошли');
   });
 
   logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('writer_user');
     showWelcome();
+    notifyUserChanged();
     alert('Вы вышли');
   });
 

@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const streakEl = document.getElementById('writingStreak');
   if (!streakEl) return;
 
+  function getLoggedUser() {
+    return typeof getCurrentUser === 'function'
+      ? getCurrentUser()
+      : localStorage.getItem('writer_user');
+  }
+
   function pad(n){return String(n).padStart(2,'0');}
   function normalizeDate(d){
     if (!d) return '';
@@ -19,22 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveEntries(e){ localStorage.setItem(STORAGE_KEY, JSON.stringify(e)); }
 
   const today = normalizeDate(new Date());
-  let entries = loadEntries().map(en => ({ date: normalizeDate(en.date), words: Number(en.words)||0, minutes: Number(en.minutes)||0 }));
+  let entries = [];
+  let goodDates = new Set();
 
-  // First visit: ensure there's at least one entry for today
-  let firstInit = false;
-  if (!entries.length) {
-    entries.push({ date: today, words: 0, minutes: 0, intensity: 0, savedAt: new Date().toISOString() });
-    saveEntries(entries);
-    firstInit = true;
+  function buildStreakData() {
+    entries = loadEntries().map(en => ({ date: normalizeDate(en.date), words: Number(en.words)||0, minutes: Number(en.minutes)||0 }));
+    let firstInit = false;
+    if (!entries.length) {
+      entries.push({ date: today, words: 0, minutes: 0, intensity: 0, savedAt: new Date().toISOString() });
+      saveEntries(entries);
+      firstInit = true;
+    }
+
+    const dates = new Set();
+    entries.forEach(e => {
+      if (e.words >= 100) dates.add(e.date);
+    });
+    if (firstInit) dates.add(today);
+    return dates;
   }
-
-  // Build set of 'good' dates: words >= 100; also count firstInit today as a start
-  const goodDates = new Set();
-  entries.forEach(e => {
-    if (e.words >= 100) goodDates.add(e.date);
-  });
-  if (firstInit) goodDates.add(today);
 
   function computeCurrentStreak() {
     let streak = 0;
@@ -74,8 +83,25 @@ document.addEventListener('DOMContentLoaded', () => {
     streakEl.title = `Текущая серия: ${days} дней. Максимум: ${longest} дней.`;
   }
 
+  function updateVisibility() {
+    const isLoggedIn = Boolean(getLoggedUser());
+    streakEl.style.display = isLoggedIn ? 'block' : 'none';
+    return isLoggedIn;
+  }
+
+  function refreshWidget() {
+    if (!updateVisibility()) return;
+    goodDates = buildStreakData();
+    render();
+  }
+
   streakEl.addEventListener('click', () => { window.location.href = 'writing-calendar.html'; });
-  render();
-  // keep widget updated when calendar changes in other tabs
-  window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) { entries = loadEntries(); render(); } });
+  refreshWidget();
+
+  window.addEventListener('writer-user-changed', refreshWidget);
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORAGE_KEY || e.key === 'writer_user') {
+      refreshWidget();
+    }
+  });
 });
