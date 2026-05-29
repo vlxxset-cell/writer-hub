@@ -22,9 +22,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const undoToast = document.getElementById('calendarUndoToast');
   const undoBtn = document.getElementById('undoBtn');
   const undoProgressBar = document.getElementById('undoProgressBar');
+  const calendarNotice = document.getElementById('calendarNotice');
   const deleteEntryBtn = document.getElementById('deleteEntryBtn');
 
   let pendingUndo = null; // { timerId, restoreFn }
+  let calendarNoticeTimer = null;
+
+  function showCalendarNotice(message, type = 'success', duration = 4200) {
+    if (!calendarNotice) return;
+    calendarNotice.classList.remove('success', 'warning');
+    calendarNotice.classList.add(type);
+    calendarNotice.textContent = message;
+    calendarNotice.classList.add('show');
+    if (calendarNoticeTimer) clearTimeout(calendarNoticeTimer);
+    calendarNoticeTimer = setTimeout(() => {
+      calendarNotice.classList.remove('show');
+    }, duration);
+  }
   // View state for heatmap (0-based month)
   let viewYear = new Date().getFullYear();
   let viewMonth = new Date().getMonth();
@@ -281,6 +295,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveEntries(entries);
     rebuild();
+
+    if (payload.words >= 100) {
+      showCalendarNotice('Челлендж выполнен! Сегодняшний день добавлен с отличным объёмом.', 'success');
+    } else if (payload.words === 0 && payload.minutes === 0) {
+      showCalendarNotice('Ваша серия окончена. Продолжайте писать, чтобы возобновить прогресс.', 'warning');
+    }
+
     // Сохранение выполняется автоматически без блокирующих окон
   }
 

@@ -349,6 +349,107 @@ body.dark-theme button:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.achievements-panel {
+  position: fixed;
+  top: 76px;
+  left: 16px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(236, 208, 219, 0.9);
+  box-shadow: var(--shadow-lg);
+  z-index: 105;
+  backdrop-filter: blur(12px);
+}
+
+body.dark-theme .achievements-panel {
+  background: rgba(18, 9, 23, 0.90);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.achievements-panel h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.achievement-badge {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(236, 208, 219, 0.75);
+}
+
+body.dark-theme .achievement-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.achievement-badge.unlocked {
+  background: linear-gradient(135deg, rgba(217, 156, 178, 0.18), rgba(255, 255, 255, 0.08));
+}
+
+.achievement-badge .achievement-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.achievement-badge .achievement-desc {
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.achievement-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(236, 208, 219, 0.4);
+}
+
+body.dark-theme .achievement-bar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.achievement-bar > div {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  transition: width 0.35s ease;
+}
+
+.achievement-percent {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .achievements-panel {
+    top: 84px;
+    left: 12px;
+    width: calc(100vw - 24px);
+    max-height: 58vh;
+  }
+}
+
 .add-book-button {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
   color: white;
@@ -1601,6 +1702,78 @@ input:hover, textarea:hover, select:hover {
   pointer-events: none;
   transition: all 0.3s ease;
   z-index: 9999;
+}
+
+.calendar-notice {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-14px);
+  width: min(92vw, 440px);
+  padding: 16px 18px;
+  border-radius: 18px;
+  box-shadow: var(--shadow-xl);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  z-index: 111;
+  display: grid;
+  gap: 10px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(236, 208, 219, 0.9);
+  color: var(--color-text-primary);
+}
+
+body.dark-theme .calendar-notice {
+  background: rgba(17, 8, 18, 0.92);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary);
+}
+
+.calendar-notice.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.calendar-notice.success {
+  border-color: rgba(34, 197, 94, 0.22);
+  background: linear-gradient(135deg, rgba(134, 239, 172, 0.20), rgba(255, 255, 255, 0.92));
+}
+
+body.dark-theme .calendar-notice.success {
+  background: linear-gradient(135deg, rgba(134, 239, 172, 0.16), rgba(34, 197, 94, 0.08));
+}
+
+.calendar-notice.warning {
+  border-color: rgba(236, 72, 153, 0.22);
+  background: linear-gradient(135deg, rgba(251, 207, 232, 0.28), rgba(255, 255, 255, 0.92));
+}
+
+body.dark-theme .calendar-notice.warning {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.16), rgba(255, 255, 255, 0.08));
+}
+
+.calendar-notice strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.calendar-notice .notice-line {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+@keyframes noticePulse {
+  0% { transform: translateX(-50%) translateY(-14px); }
+  50% { transform: translateX(-50%) translateY(0px); }
+  100% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.calendar-notice.show {
+  animation: noticePulse 0.6s ease;
 }
 
 .undo-progress {
