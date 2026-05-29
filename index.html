@@ -11,11 +11,17 @@
   <script src="theme.js" defer></script>
   <script src="index.js" defer></script>
   <script src="transition.js" defer></script>
+  <script src="streaks.js" defer></script>
 </head>
 
 <body>
 
 <button id="themeToggle" class="theme-toggle">🌙</button>
+  <div id="writingStreak" class="writing-streak" role="status" aria-live="polite">
+    <div class="streak-line">🔥 <span id="streakDays">0</span> days writing streak</div>
+    <div class="streak-sub">Longest: <span id="streakLongest">0</span></div>
+    <div class="streak-action">Не прерви серию</div>
+  </div>
 
 <div class="auth-panel">
   <div id="welcomeUser" style="display:none; font-size: 0.85rem; color: var(--color-primary); font-weight: 600; margin-bottom: 8px;"></div>

@@ -2397,3 +2397,28 @@ textarea {
 .text-right { text-align: right; }
 .text-secondary { color: var(--color-text-secondary); }
 .text-tertiary { color: var(--color-text-tertiary); }
+
+/* ===== WRITING STREAK WIDGET ===== */
+.writing-streak {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 110;
+  font-weight: 700;
+  text-align: right;
+  cursor: pointer;
+  min-width: 160px;
+}
+.writing-streak .streak-line { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 0.95rem; }
+.writing-streak .streak-sub { font-size: 0.78rem; opacity: 0.95; margin-top: 6px; }
+.writing-streak .streak-action { font-size: 0.72rem; opacity: 0.95; margin-top: 8px; background: rgba(255,255,255,0.08); padding: 4px 8px; border-radius: 999px; display: inline-block; }
+
+@media (max-width: 480px) {
+  .writing-streak { right: 12px; top: 12px; padding: 8px 10px; min-width: 140px; }
+  .writing-streak .streak-line { font-size: 0.85rem; }
+}

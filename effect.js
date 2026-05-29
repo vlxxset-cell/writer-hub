@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const idleNotification = document.getElementById('idleNotification');
   let idleWarningTimer = null;
   let idleDeleteTimer = null;
+  let idleCheckerInterval = null;
+  let lastActivity = Date.now();
+  let warningActive = false;
 
   function hideIdleNotification() {
     if (!idleNotification) return;
@@ -48,37 +51,43 @@ document.addEventListener('DOMContentLoaded', () => {
     idleNotification.classList.add('visible');
   }
 
-  function clearIdleTimers() {
-    clearTimeout(idleWarningTimer);
-    clearTimeout(idleDeleteTimer);
-    idleWarningTimer = null;
-    idleDeleteTimer = null;
+  function performIdleDeletionIfNeeded() {
+    const textPresent = (focusText.innerText || '').trim().length > 0;
+    const htmlStr = (focusText.innerHTML || '').replace(/<br\s*\/?>/gi, '').replace(/&nbsp;/gi, '').replace(/\s+/g, '');
+    const htmlPresent = htmlStr.length > 0;
+    if (textPresent || htmlPresent) {
+      focusText.innerHTML = '';
+      updateMetrics();
+    }
+    hideIdleNotification();
+    warningActive = false;
   }
 
-  function scheduleIdleTimers() {
-    clearIdleTimers();
-    idleWarningTimer = setTimeout(() => {
-      showIdleWarning();
-      idleDeleteTimer = setTimeout(() => {
-        // Robust content check: consider innerText or meaningful HTML (not just <br> or &nbsp;)
-        const textPresent = (focusText.innerText || '').trim().length > 0;
-        const htmlStr = (focusText.innerHTML || '').replace(/<br\s*\/?>/gi, '').replace(/&nbsp;/gi, '').replace(/\s+/g, '');
-        const htmlPresent = htmlStr.length > 0;
-        if (textPresent || htmlPresent) {
-          focusText.innerHTML = '';
-          updateMetrics();
-        }
-        hideIdleNotification();
-      }, 60_000);
-    }, 120_000);
+  function startIdleChecker() {
+    if (idleCheckerInterval) return;
+    idleCheckerInterval = setInterval(() => {
+      const delta = Date.now() - (lastActivity || 0);
+      if (!warningActive && delta >= 120_000) {
+        showIdleWarning();
+        warningActive = true;
+      }
+      if (warningActive && delta >= 180_000) {
+        performIdleDeletionIfNeeded();
+      }
+    }, 3000);
+  }
+
+  function stopIdleChecker() {
+    if (idleCheckerInterval) { clearInterval(idleCheckerInterval); idleCheckerInterval = null; }
+    warningActive = false;
   }
 
   function resetIdleTimers() {
     hideIdleNotification();
-    clearIdleTimers();
-    // Перезапускаем таймер простоя всегда после ввода/нажатия,
-    // чтобы предупреждение появлялось даже при отсутствии введённых символов.
-    scheduleIdleTimers();
+    lastActivity = Date.now();
+    warningActive = false;
+    if (idleCheckerInterval) { clearInterval(idleCheckerInterval); idleCheckerInterval = null; }
+    startIdleChecker();
   }
 
   function formatTime(seconds) {
@@ -101,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionCountValue += 1;
     sessionCount.textContent = sessionCountValue;
     // Запускаем детектор простоя при старте сессии
-    scheduleIdleTimers();
+    lastActivity = Date.now();
+    startIdleChecker();
   }
 
   function pauseTimer() {
@@ -132,14 +142,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  focusText.addEventListener('input', () => {
-    updateMetrics();
-    resetIdleTimers();
+  // catch many input-related events to update last activity reliably on mobile/desktop
+  ['input','keydown','keyup','paste','cut','compositionend'].forEach(evt => {
+    focusText.addEventListener(evt, (e) => {
+      lastActivity = Date.now();
+      if (evt === 'input' || evt === 'paste' || evt === 'cut' || evt === 'compositionend') updateMetrics();
+      resetIdleTimers();
+    });
   });
-  focusText.addEventListener('keydown', resetIdleTimers);
+  // pointer interactions (tap/click) should also count as activity even if not typing
+  ['pointerdown','touchstart','mousedown','click'].forEach(evt => {
+    focusText.addEventListener(evt, () => { lastActivity = Date.now(); });
+  });
   focusText.addEventListener('focus', () => {
     focusText.classList.add('focus-active');
-    scheduleIdleTimers();
+    lastActivity = Date.now();
+    startIdleChecker();
   });
   focusText.addEventListener('blur', () => focusText.classList.remove('focus-active'));
 
@@ -151,5 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateMetrics();
   refreshTimer();
   // Начать отслеживание простоя сразу после загрузки страницы
-  scheduleIdleTimers();
+  lastActivity = Date.now();
+  startIdleChecker();
+  window.addEventListener('beforeunload', () => { if (idleCheckerInterval) clearInterval(idleCheckerInterval); });
 });
