@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const regToggleBtn = document.getElementById('regToggleBtn');
   const showRegisterBtn = document.getElementById('showRegisterBtn');
   const achievementPanel = document.getElementById('achievementPanel');
+  const achievementsButton = document.getElementById('achievementsButton');
 
   function loadUsers() {
     try { return JSON.parse(localStorage.getItem('users') || '{}'); } catch { return {}; }
@@ -174,6 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderAchievements();
+
+  if (achievementsButton) {
+    achievementsButton.addEventListener('click', () => {
+      window.location.href = 'achievements.html';
+    });
+  }
 
   loginToggleBtn.addEventListener('click', () => {
     authButtons.style.display = 'none';
