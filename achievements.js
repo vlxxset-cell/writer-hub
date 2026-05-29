@@ -110,7 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const achievements = computeAchievements(entries);
     const nodes = achievements.map((item) => `
       <div class="achievement-badge${item.progress === 100 ? ' unlocked' : ''}">
-        <div class="achievement-title"><span>${item.icon}</span><span>${item.name}</span><span>${item.progress}%</span></div>
+        <div class="achievement-title">
+          <span>${item.icon}</span>
+          <span>${item.name}</span>
+          <span class="achievement-percent">${item.progress}%</span>
+          <span class="achievement-check">${item.progress === 100 ? '✓' : ''}</span>
+        </div>
         <div class="achievement-desc">${item.desc}</div>
         <div class="achievement-bar"><div style="width: ${item.progress}%"></div></div>
       </div>
