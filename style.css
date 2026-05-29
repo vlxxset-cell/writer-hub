@@ -633,36 +633,31 @@ body.dark-theme button:hover {
   box-shadow: var(--shadow-sm);
 }
 
-.dark-theme .heatmap-cell {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.08);
-  color: var(--color-text-secondary);
-}
+  .heatmap-cell.placeholder {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+  }
 
-.dark-theme .heatmap-cell:hover {
-  box-shadow: 0 12px 24px rgba(0,0,0,0.18);
-}
+  .heat-level-1 { background: rgba(134, 239, 172, 0.3); }
+  .heat-level-2 { background: rgba(34, 197, 94, 0.35); }
+  .heat-level-3 { background: rgba(16, 185, 129, 0.45); }
+  .heat-level-4 { background: rgba(5, 150, 105, 0.55); color: white; }
 
-.dark-theme .heat-level-1 { background: rgba(255, 193, 212, 0.18); }
-.dark-theme .heat-level-2 { background: rgba(255, 156, 186, 0.26); }
-.dark-theme .heat-level-3 { background: rgba(226, 102, 152, 0.34); }
-.dark-theme .heat-level-4 { background: rgba(180, 56, 104, 0.58); color: white; }
+  .dark-theme .heatmap-cell {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+    color: var(--color-text-secondary);
+  }
 
-.heatmap-cell.placeholder {
-  background: transparent;
-  border-color: transparent;
-  cursor: default;
-}
+  .dark-theme .heatmap-cell:hover {
+    box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+  }
 
-.heat-level-1 { background: rgba(134, 239, 172, 0.3); }
-.heat-level-2 { background: rgba(34, 197, 94, 0.35); }
-.heat-level-3 { background: rgba(16, 185, 129, 0.45); }
-.heat-level-4 { background: rgba(5, 150, 105, 0.55); color: white; }
-
-.month-report {
-  display: grid;
-  gap: 14px;
-}
+  .dark-theme .heat-level-1 { background: rgba(255, 193, 212, 0.18); }
+  .dark-theme .heat-level-2 { background: rgba(255, 156, 186, 0.26); }
+  .dark-theme .heat-level-3 { background: rgba(226, 102, 152, 0.34); }
+  .dark-theme .heat-level-4 { background: rgba(180, 56, 104, 0.58); color: white; }
 
 .report-row {
   display: grid;
@@ -2152,7 +2147,7 @@ textarea {
   padding: 20px;
   min-width: 300px;
   max-width: 380px;
-  z-index: 99;
+  z-index: 120;
   box-shadow: var(--shadow-lg);
 }
 
@@ -2448,7 +2443,7 @@ textarea {
 /* ===== WRITING STREAK WIDGET ===== */
 .writing-streak {
   position: fixed;
-  top: 16px;
+  top: 240px;
   right: 16px;
   background: linear-gradient(135deg, var(--color-accent), var(--color-primary-dark));
   color: #fff;
