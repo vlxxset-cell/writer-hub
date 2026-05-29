@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (focusText.innerText.trim().length > 0) {
           focusText.innerHTML = '';
           updateMetrics();
-          hideIdleNotification();
         }
+        hideIdleNotification();
       }, 60_000);
     }, 120_000);
   }
@@ -72,9 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetIdleTimers() {
     hideIdleNotification();
     clearIdleTimers();
-    if (focusText.innerText.trim().length > 0) {
-      scheduleIdleTimers();
-    }
+    // Перезапускаем таймер простоя всегда после ввода/нажатия,
+    // чтобы предупреждение появлялось даже при отсутствии введённых символов.
+    scheduleIdleTimers();
   }
 
   function formatTime(seconds) {
@@ -96,6 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
     sessionCountValue += 1;
     sessionCount.textContent = sessionCountValue;
+    // Запускаем детектор простоя при старте сессии
+    scheduleIdleTimers();
   }
 
   function pauseTimer() {
@@ -133,9 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
   focusText.addEventListener('keydown', resetIdleTimers);
   focusText.addEventListener('focus', () => {
     focusText.classList.add('focus-active');
-    if (focusText.innerText.trim().length > 0) {
-      scheduleIdleTimers();
-    }
+    scheduleIdleTimers();
   });
   focusText.addEventListener('blur', () => focusText.classList.remove('focus-active'));
 
@@ -146,4 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initToolbar();
   updateMetrics();
   refreshTimer();
+  // Начать отслеживание простоя сразу после загрузки страницы
+  scheduleIdleTimers();
 });
