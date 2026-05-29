@@ -60,7 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
     idleWarningTimer = setTimeout(() => {
       showIdleWarning();
       idleDeleteTimer = setTimeout(() => {
-        if (focusText.innerText.trim().length > 0) {
+        // Robust content check: consider innerText or meaningful HTML (not just <br> or &nbsp;)
+        const textPresent = (focusText.innerText || '').trim().length > 0;
+        const htmlStr = (focusText.innerHTML || '').replace(/<br\s*\/?>/gi, '').replace(/&nbsp;/gi, '').replace(/\s+/g, '');
+        const htmlPresent = htmlStr.length > 0;
+        if (textPresent || htmlPresent) {
           focusText.innerHTML = '';
           updateMetrics();
         }
