@@ -2324,8 +2324,9 @@ textarea {
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 100;
+  z-index: 110;
   box-shadow: var(--shadow-md);
+  text-decoration: none;
 }
 
 .achievements-button:hover {
