@@ -19,6 +19,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const fortuneAdminPanel = document.getElementById('fortuneAdminPanel');
   const resetFortuneButton = document.getElementById('resetFortuneButton');
   const simulateTenButton = document.getElementById('simulateTenButton');
+  const dailySpinLimit = 10;
+
+  function autoResetAllFortune() {
+    if (localStorage.getItem('fortuneAutoResetDone') === '1') return;
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    const currentUser = localStorage.getItem('writer_user');
+    Object.keys(users).forEach((user) => {
+      localStorage.setItem('writer_user', user);
+      [
+        'fortuneCoins',
+        'fortuneLastSpin',
+        'fortuneExtraSpin',
+        'fortuneCurrentTask',
+        'fortunePurchases',
+        'fortuneHistory',
+        'fortuneSpinDay',
+        'fortuneSpinsToday'
+      ].forEach((key) => localStorage.removeItem(key));
+    });
+    if (currentUser) {
+      localStorage.setItem('writer_user', currentUser);
+    } else {
+      localStorage.removeItem('writer_user');
+    }
+    localStorage.setItem('fortuneAutoResetDone', '1');
+  }
 
   const categories = [
     {
@@ -78,6 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'trinket', icon: '⚔️', title: 'Ещё одна фишка', cost: 350, desc: 'Особый бонус для авторского настроения.' }
   ];
 
+  autoResetAllFortune();
+
   const state = {
     coins: Number(localStorage.getItem('fortuneCoins')) || 0,
     lastSpin: localStorage.getItem('fortuneLastSpin') || null,
@@ -85,6 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
     currentTask: JSON.parse(localStorage.getItem('fortuneCurrentTask') || 'null'),
     purchases: JSON.parse(localStorage.getItem('fortunePurchases') || '[]'),
     history: JSON.parse(localStorage.getItem('fortuneHistory') || '[]'),
+    spinDay: localStorage.getItem('fortuneSpinDay') || null,
+    spinsToday: Number(localStorage.getItem('fortuneSpinsToday') || 0),
     spinInProgress: false
   };
 
@@ -113,6 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('fortuneCurrentTask', JSON.stringify(state.currentTask));
     localStorage.setItem('fortunePurchases', JSON.stringify(state.purchases));
     localStorage.setItem('fortuneHistory', JSON.stringify(state.history));
+    localStorage.setItem('fortuneSpinDay', state.spinDay || '');
+    localStorage.setItem('fortuneSpinsToday', String(state.spinsToday));
   }
 
   function chooseOutcome() {
@@ -130,30 +162,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateSpinNote() {
     const today = getTodayKey();
-    const spunToday = isSameDay(state.lastSpin, today);
-    const extraAvailable = state.extraSpin && !spunToday;
-    const extraAfterSpin = state.extraSpin && spunToday;
-    if (!state.lastSpin || !spunToday) {
-      spinNote.textContent = 'Вращение доступно. Тратиться только 1 раз в день.';
-      spinButton.disabled = false;
-      spinAgainButton.style.display = 'none';
-    } else if (extraAvailable || extraAfterSpin) {
-      spinNote.textContent = 'Дополнительное вращение доступно после получения бонуса.';
-      spinButton.disabled = true;
-      spinAgainButton.style.display = 'inline-flex';
-    } else {
-      spinNote.textContent = 'Вращение уже выполнено сегодня. Возвращайтесь завтра.';
-      spinButton.disabled = true;
-      spinAgainButton.style.display = 'none';
+    const sameDay = isSameDay(state.spinDay, today);
+    if (!sameDay) {
+      state.spinDay = today;
+      state.spinsToday = 0;
     }
+
+    const remaining = Math.max(0, dailySpinLimit - state.spinsToday);
+    const hasBonus = state.extraSpin;
     if (state.spinInProgress) {
       spinNote.textContent = 'Колесо вращается... Ждите результата.';
       spinButton.disabled = true;
       spinAgainButton.disabled = true;
+      spinAgainButton.style.display = 'none';
+    } else if (remaining > 0) {
+      spinNote.textContent = `Доступно ${remaining} из ${dailySpinLimit} круток сегодня.`;
+      spinButton.disabled = false;
+      spinAgainButton.style.display = 'none';
+    } else if (hasBonus) {
+      spinNote.textContent = `Все ${dailySpinLimit} круток выполнены, но есть бонусное вращение.`;
+      spinButton.disabled = true;
+      spinAgainButton.style.display = 'inline-flex';
+    } else {
+      spinNote.textContent = `Все ${dailySpinLimit} круток сегодня использованы.`;
+      spinButton.disabled = true;
+      spinAgainButton.style.display = 'none';
     }
 
     lastSpinDateEl.textContent = formatDate(state.lastSpin);
-    spinsTodayEl.textContent = (spunToday ? (state.extraSpin && !extraAfterSpin ? '1 + доп.' : '1') : '0');
+    spinsTodayEl.textContent = `${state.spinsToday}/${dailySpinLimit}${hasBonus ? ' + бонус' : ''}`;
   }
 
   function getRarityClass(rarity) {
@@ -249,12 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUser = localStorage.getItem('writer_user');
     Object.keys(users).forEach((user) => {
       localStorage.setItem('writer_user', user);
-      localStorage.removeItem('fortuneCoins');
-      localStorage.removeItem('fortuneLastSpin');
-      localStorage.removeItem('fortuneExtraSpin');
-      localStorage.removeItem('fortuneCurrentTask');
-      localStorage.removeItem('fortunePurchases');
-      localStorage.removeItem('fortuneHistory');
+      ['fortuneCoins', 'fortuneLastSpin', 'fortuneExtraSpin', 'fortuneCurrentTask', 'fortunePurchases', 'fortuneHistory', 'fortuneSpinDay', 'fortuneSpinsToday'].forEach((key) => localStorage.removeItem(key));
     });
     if (currentUser) {
       localStorage.setItem('writer_user', currentUser);
@@ -267,8 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
     state.currentTask = null;
     state.purchases = [];
     state.history = [];
+    state.spinDay = null;
+    state.spinsToday = 0;
     updateUI();
-    alert('Монеты и вращения обнулены для всех пользователей.');
+    alert('Монеты и крутки обнулены для всех пользователей.');
   }
 
   function simulateSpins(count) {
@@ -298,16 +332,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function canSpin() {
     const today = getTodayKey();
-    return !state.lastSpin || !isSameDay(state.lastSpin, today) || state.extraSpin;
+    const sameDay = isSameDay(state.spinDay, today);
+    const remaining = sameDay ? Math.max(0, dailySpinLimit - state.spinsToday) : dailySpinLimit;
+    return remaining > 0 || state.extraSpin;
   }
 
-  function recordSpin() {
+  function recordSpin(usedExtra = false) {
     const today = getTodayKey();
-    if (!state.lastSpin || !isSameDay(state.lastSpin, today)) {
-      state.lastSpin = new Date().toISOString();
-    } else if (state.extraSpin) {
-      state.extraSpin = false;
+    if (!isSameDay(state.spinDay, today)) {
+      state.spinDay = today;
+      state.spinsToday = 0;
     }
+    if (usedExtra) {
+      state.extraSpin = false;
+    } else {
+      state.spinsToday += 1;
+    }
+    state.lastSpin = new Date().toISOString();
     saveState();
   }
 
@@ -331,12 +372,16 @@ document.addEventListener('DOMContentLoaded', () => {
     state.spinInProgress = true;
     updateUI();
     const outcome = chooseOutcome();
+    const today = getTodayKey();
+    const sameDay = isSameDay(state.spinDay, today);
+    const remaining = sameDay ? Math.max(0, dailySpinLimit - state.spinsToday) : dailySpinLimit;
+    const useExtra = remaining <= 0 && state.extraSpin;
     const rotation = 360 * 6 + Math.random() * 360;
     fortuneWheel.style.transition = 'transform 3.5s cubic-bezier(0.33, 1, 0.68, 1)';
     fortuneWheel.style.transform = `rotate(${rotation}deg)`;
     setTimeout(() => {
       state.spinInProgress = false;
-      recordSpin();
+      recordSpin(useExtra);
       setOutcome(outcome);
       fortuneWheel.style.transition = 'none';
       fortuneWheel.style.transform = `rotate(${rotation % 360}deg)`;
