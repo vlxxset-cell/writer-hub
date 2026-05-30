@@ -163,12 +163,15 @@ body.dark-theme::after {
   color: var(--color-text-primary);
 }
 
-.dark-theme .open-btn,
-.dark-theme .add-book-button,
-.dark-theme .modal-buttons button:nth-child(2),
-.dark-theme .undo-toast button,
-.dark-theme .upload-btn {
-  box-shadow: 0 14px 30px rgba(99, 102, 241, 0.24);
+.dark-theme .wheel-center {
+  background: rgba(22, 10, 28, 0.92);
+  color: #f8f4ff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.44);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark-theme .store-balance {
+  color: var(--color-text-primary);
 }
 
 /* ===== TYPOGRAPHY ===== */

@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const storeGrid = document.getElementById('storeGrid');
   const storeCoinsBalance = document.getElementById('storeCoinsBalance');
   const fortuneWheel = document.getElementById('fortuneWheel');
-  const wheelResult = document.getElementById('wheelResult');
+  let wheelResult = document.getElementById('wheelResult');
   const spinHint = document.getElementById('spinHint');
   const fortuneAdminPanel = document.getElementById('fortuneAdminPanel');
   const resetFortuneButton = document.getElementById('resetFortuneButton');
@@ -104,6 +104,31 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'game', icon: '🎮', title: 'Игра или крупная покупка', cost: 500, desc: 'Реальная награда за серьёзный прогресс.' },
     { id: 'trinket', icon: '⚔️', title: 'Ещё одна фишка', cost: 350, desc: 'Особый бонус для авторского настроения.' }
   ];
+
+  const wheelSegments = [
+    categories[0].tasks[0],
+    categories[0].tasks[1],
+    categories[1].tasks[0],
+    categories[1].tasks[1],
+    categories[2].tasks[0],
+    categories[2].tasks[1],
+    categories[3].tasks[0],
+    categories[3].tasks[1]
+  ];
+
+  function initWheelSegments() {
+    const segmentsHtml = wheelSegments.map((task, index) => `
+      <div class="wheel-sector" style="--i:${index};">
+        <span class="sector-label">${task.name}</span>
+      </div>
+    `).join('');
+
+    fortuneWheel.innerHTML = `
+      <div class="wheel-center" id="wheelResult">Поверните колесо</div>
+      ${segmentsHtml}
+    `;
+    wheelResult = document.getElementById('wheelResult');
+  }
 
   autoResetAllFortune();
 
@@ -451,5 +476,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  initWheelSegments();
   updateUI();
 });
