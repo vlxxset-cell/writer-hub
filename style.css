@@ -779,6 +779,17 @@ body.dark-theme .achievement-bar {
   min-width: 120px;
 }
 
+.fortune-admin {
+  background: rgba(254, 243, 199, 0.85);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.fortune-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 @media (max-width: 980px) {
   .fortune-top {
     grid-template-columns: 1fr;

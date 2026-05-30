@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const fortuneWheel = document.getElementById('fortuneWheel');
   const wheelResult = document.getElementById('wheelResult');
   const spinHint = document.getElementById('spinHint');
+  const fortuneAdminPanel = document.getElementById('fortuneAdminPanel');
+  const resetFortuneButton = document.getElementById('resetFortuneButton');
+  const simulateTenButton = document.getElementById('simulateTenButton');
 
   const categories = [
     {
@@ -81,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     extraSpin: JSON.parse(localStorage.getItem('fortuneExtraSpin') || 'false'),
     currentTask: JSON.parse(localStorage.getItem('fortuneCurrentTask') || 'null'),
     purchases: JSON.parse(localStorage.getItem('fortunePurchases') || '[]'),
+    history: JSON.parse(localStorage.getItem('fortuneHistory') || '[]'),
     spinInProgress: false
   };
 
@@ -108,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('fortuneExtraSpin', JSON.stringify(state.extraSpin));
     localStorage.setItem('fortuneCurrentTask', JSON.stringify(state.currentTask));
     localStorage.setItem('fortunePurchases', JSON.stringify(state.purchases));
+    localStorage.setItem('fortuneHistory', JSON.stringify(state.history));
   }
 
   function chooseOutcome() {
@@ -239,6 +244,58 @@ document.addEventListener('DOMContentLoaded', () => {
     spinAgainButton.disabled = state.spinInProgress;
   }
 
+  function resetFortuneData() {
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    const currentUser = localStorage.getItem('writer_user');
+    Object.keys(users).forEach((user) => {
+      localStorage.setItem('writer_user', user);
+      localStorage.removeItem('fortuneCoins');
+      localStorage.removeItem('fortuneLastSpin');
+      localStorage.removeItem('fortuneExtraSpin');
+      localStorage.removeItem('fortuneCurrentTask');
+      localStorage.removeItem('fortunePurchases');
+      localStorage.removeItem('fortuneHistory');
+    });
+    if (currentUser) {
+      localStorage.setItem('writer_user', currentUser);
+    } else {
+      localStorage.removeItem('writer_user');
+    }
+    state.coins = 0;
+    state.lastSpin = null;
+    state.extraSpin = false;
+    state.currentTask = null;
+    state.purchases = [];
+    state.history = [];
+    updateUI();
+    alert('Монеты и вращения обнулены для всех пользователей.');
+  }
+
+  function simulateSpins(count) {
+    const results = [];
+    let lastOutcome = null;
+    for (let i = 0; i < count; i += 1) {
+      const outcome = chooseOutcome();
+      lastOutcome = outcome;
+      state.history.push({ when: new Date().toISOString(), result: outcome.name, rarity: outcome.rarity, coins: outcome.coins });
+      results.push(outcome.name);
+    }
+    state.currentTask = {
+      ...lastOutcome,
+      completed: false,
+      mode: 'safe',
+      assignedAt: new Date().toISOString()
+    };
+    state.coins = 0;
+    state.lastSpin = null;
+    state.extraSpin = false;
+    saveState();
+    wheelResult.textContent = `Симуляция ${count} круток`;
+    taskMessage.textContent = `Симулировано ${count} круток. Последнее задание: ${state.currentTask.name}`;
+    updateUI();
+    alert(`Симулировано ${count} круток:\n${results.join('\n')}`);
+  }
+
   function canSpin() {
     const today = getTodayKey();
     return !state.lastSpin || !isSameDay(state.lastSpin, today) || state.extraSpin;
@@ -333,8 +390,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTask();
   });
 
-  spinButton.addEventListener('click', spinWheel);
-  spinAgainButton.addEventListener('click', spinWheel);
+  spinButton.addEventListener('click', () => spinWheel(false));
+  spinAgainButton.addEventListener('click', () => spinWheel(false));
+
+  if (fortuneAdminPanel) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === '1') {
+      fortuneAdminPanel.hidden = false;
+      resetFortuneButton.addEventListener('click', resetFortuneData);
+      simulateTenButton.addEventListener('click', () => simulateSpins(10));
+    }
+  }
 
   updateUI();
 });

@@ -8,7 +8,7 @@
     return origGet('writer_user');
   }
 
-  const userScopedKeys = new Set(['books', 'currentBook', 'notes', 'visual', 'effectDraft', 'writingCalendarEntries']);
+  const userScopedKeys = new Set(['books', 'currentBook', 'notes', 'visual', 'effectDraft', 'writingCalendarEntries', 'fortuneCoins', 'fortuneLastSpin', 'fortuneExtraSpin', 'fortuneCurrentTask', 'fortunePurchases', 'fortuneHistory']);
 
   // expose helpers
   window.getCurrentUser = currentUser;
