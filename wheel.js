@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const safeMode = document.getElementById('safeMode');
   const riskyMode = document.getElementById('riskyMode');
   const storeGrid = document.getElementById('storeGrid');
+  const storeCoinsBalance = document.getElementById('storeCoinsBalance');
   const fortuneWheel = document.getElementById('fortuneWheel');
   const wheelResult = document.getElementById('wheelResult');
   const spinHint = document.getElementById('spinHint');
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lastSpin: localStorage.getItem('fortuneLastSpin') || null,
     extraSpin: JSON.parse(localStorage.getItem('fortuneExtraSpin') || 'false'),
     currentTask: JSON.parse(localStorage.getItem('fortuneCurrentTask') || 'null'),
-    purchases: JSON.parse(localStorage.getItem('fortunePurchases') || '[]'),
+    purchases: JSON.parse(localStorage.getItem('fortunePurchases') || '{}'),
     history: JSON.parse(localStorage.getItem('fortuneHistory') || '[]'),
     spinDay: localStorage.getItem('fortuneSpinDay') || null,
     spinsToday: Number(localStorage.getItem('fortuneSpinsToday') || 0),
@@ -210,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     taskRarity.textContent = `${state.currentTask.rarity} задание`;
     taskRarity.className = `subtitle ${getRarityClass(state.currentTask.category)}`;
     taskCoins.textContent = state.currentTask.coins > 0 ? `+${state.currentTask.coins} 🪙` : '🎁 Доп. вращение';
-    taskMessage.textContent = state.currentTask.desc || 'Выполните задание и нажмите кнопку ниже.';
+    taskMessage.innerHTML = `<strong>${state.currentTask.name}</strong>${state.currentTask.desc ? `<div class="task-desc">${state.currentTask.desc}</div>` : ''}`;
     taskActions.innerHTML = '';
 
     if (state.currentTask.completed) {
@@ -238,10 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderStore() {
     storeGrid.innerHTML = storeItems.map((item) => {
-      const purchased = state.purchases.includes(item.id);
+      const count = Number(state.purchases[item.id] || 0);
       const affordable = state.coins >= item.cost;
       return `
-        <article class="store-card ${purchased ? 'purchased' : ''}">
+        <article class="store-card">
           <div class="store-icon">${item.icon}</div>
           <div class="store-info">
             <strong>${item.title}</strong>
@@ -249,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="store-action">
             <span class="store-cost">${item.cost} 🪙</span>
-            <button data-id="${item.id}" ${purchased ? 'disabled' : affordable ? '' : 'disabled'} class="${purchased ? 'edit-btn' : 'open-btn'}">${purchased ? 'Куплено' : affordable ? 'Купить' : 'Недостаточно'}</button>
+            <button data-id="${item.id}" ${affordable ? '' : 'disabled'} class="open-btn">Купить${count ? ` (${count})` : ''}</button>
           </div>
         </article>
       `;
@@ -273,6 +274,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUI() {
     coinsBalance.textContent = `${state.coins} 🪙`;
+    if (storeCoinsBalance) {
+      storeCoinsBalance.textContent = `Баланс: ${state.coins} 🪙`;
+    }
     updateSpinNote();
     renderTask();
     renderStore();
@@ -297,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.lastSpin = null;
     state.extraSpin = false;
     state.currentTask = null;
-    state.purchases = [];
+    state.purchases = {};
     state.history = [];
     state.spinDay = null;
     state.spinsToday = 0;
@@ -398,25 +402,25 @@ document.addEventListener('DOMContentLoaded', () => {
       message = 'Дополнительное вращение активировано. Теперь можно крутить колесо ещё раз сегодня.';
     }
     if (reward > 0) {
-      reward = state.currentTask.mode === 'risky' ? reward * 2 : reward;
+      const multiplier = state.currentTask.mode === 'risky' ? 2 : 1;
+      reward = reward * multiplier;
       state.coins += reward;
-      message = `Вы заработали ${reward} монет.`;
+      message = `Вы заработали ${reward} монет.${multiplier === 2 ? ' (Рискованный режим)' : ''}`;
     }
     state.currentTask.completed = true;
     state.currentTask.completedAt = new Date().toISOString();
     saveState();
-    taskMessage.textContent = message;
+    taskMessage.innerHTML = `<strong>${state.currentTask.name}</strong><div class="task-desc">${message}</div>`;
     renderTask();
     renderStore();
     updateUI();
   }
 
   function purchaseItem(itemId) {
-    if (state.purchases.includes(itemId)) return;
     const item = storeItems.find((entry) => entry.id === itemId);
     if (!item || state.coins < item.cost) return;
     state.coins -= item.cost;
-    state.purchases.push(itemId);
+    state.purchases[itemId] = Number(state.purchases[itemId] || 0) + 1;
     saveState();
     updateUI();
   }
