@@ -105,31 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'trinket', icon: '⚔️', title: 'Ещё одна фишка', cost: 350, desc: 'Особый бонус для авторского настроения.' }
   ];
 
-  const wheelSegments = [
-    categories[0].tasks[0],
-    categories[0].tasks[1],
-    categories[1].tasks[0],
-    categories[1].tasks[1],
-    categories[2].tasks[0],
-    categories[2].tasks[1],
-    categories[3].tasks[0],
-    categories[3].tasks[1]
-  ];
-
-  function initWheelSegments() {
-    const segmentsHtml = wheelSegments.map((task, index) => `
-      <div class="wheel-sector" style="--i:${index};">
-        <span class="sector-label">${task.name}</span>
-      </div>
-    `).join('');
-
-    fortuneWheel.innerHTML = `
-      <div class="wheel-center" id="wheelResult">Поверните колесо</div>
-      ${segmentsHtml}
-    `;
-    wheelResult = document.getElementById('wheelResult');
-  }
-
   autoResetAllFortune();
 
   const state = {
@@ -476,6 +451,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  initWheelSegments();
   updateUI();
 });
