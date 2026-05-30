@@ -20,6 +20,31 @@ function initFortuneWheel() {
   const simulateTenButton = document.getElementById('simulateTenButton');
   const dailySpinLimit = 2;
 
+  const requiredElements = {
+    coinsBalance,
+    spinNote,
+    spinButton,
+    spinAgainButton,
+    lastSpinDateEl,
+    spinsTodayEl,
+    taskRarity,
+    taskCoins,
+    taskMessage,
+    taskActions,
+    fortuneWheel,
+    wheelResult,
+    spinHint
+  };
+
+  const missingElements = Object.entries(requiredElements)
+    .filter(([, element]) => !element)
+    .map(([name]) => name);
+
+  if (missingElements.length > 0) {
+    console.error('wheel.js: missing required DOM elements:', missingElements.join(', '));
+    return;
+  }
+
   const categories = [
     {
       id: 'common',
