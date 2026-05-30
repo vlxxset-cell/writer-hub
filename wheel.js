@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const riskyMode = document.getElementById('riskyMode');
   const storeGrid = document.getElementById('storeGrid');
   const fortuneWheel = document.getElementById('fortuneWheel');
+  const wheelResult = document.getElementById('wheelResult');
   const spinHint = document.getElementById('spinHint');
 
   const categories = [
@@ -220,11 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function updateWheelLabel() {
+    if (state.currentTask) {
+      wheelResult.textContent = state.currentTask.name;
+    } else {
+      wheelResult.textContent = 'Поверните колесо';
+    }
+  }
+
   function updateUI() {
     coinsBalance.textContent = `${state.coins} 🪙`;
     updateSpinNote();
     renderTask();
     renderStore();
+    updateWheelLabel();
     spinButton.disabled = state.spinInProgress || (!canSpin() && !state.extraSpin);
     spinAgainButton.disabled = state.spinInProgress;
   }
@@ -254,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (outcome.id === 'extra-spin') {
       state.currentTask.desc = 'У вас есть шанс получить доп. вращение. Нажмите, чтобы активировать его.';
     }
+    wheelResult.textContent = `${outcome.name}`;
     saveState();
     renderTask();
   }
