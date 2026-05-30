@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     taskRarity.textContent = `${state.currentTask.rarity} задание`;
     taskRarity.className = `subtitle ${getRarityClass(state.currentTask.category)}`;
     taskCoins.textContent = state.currentTask.coins > 0 ? `+${state.currentTask.coins} 🪙` : '🎁 Доп. вращение';
-    taskMessage.innerHTML = `<strong>${state.currentTask.name}</strong>${state.currentTask.desc ? `<div class="task-desc">${state.currentTask.desc}</div>` : ''}`;
+    taskMessage.innerHTML = `<strong>${state.currentTask.name}</strong>${state.currentTask.desc ? `<div class="task-desc">${state.currentTask.desc}</div>` : ''}${state.currentTask.mode === 'risky' ? '<div class="task-desc">Риск выбран: ×2</div>' : ''}`;
     taskActions.innerHTML = '';
 
     if (state.currentTask.completed) {
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     completeButton.addEventListener('click', () => completeTask());
     taskActions.appendChild(completeButton);
 
-    if (['uncommon', 'rare', 'legendary'].includes(state.currentTask.category) && state.currentTask.id !== 'extra-spin') {
+    if (state.currentTask.coins > 0 && state.currentTask.id !== 'extra-spin') {
       riskChoice.hidden = false;
       state.currentTask.mode = state.currentTask.mode || 'safe';
       safeMode.classList.toggle('active', state.currentTask.mode === 'safe');
