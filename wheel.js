@@ -9,9 +9,7 @@ function initFortuneWheel() {
   const taskCoins = document.getElementById('taskCoins');
   const taskMessage = document.getElementById('taskMessage');
   const taskActions = document.getElementById('taskActions');
-  const riskChoice = document.getElementById('riskChoice');
-  const safeMode = document.getElementById('safeMode');
-  const riskyMode = document.getElementById('riskyMode');
+  const riskyModeToggle = document.getElementById('riskyModeToggle');
   const storeGrid = document.getElementById('storeGrid');
   const storeCoinsBalance = document.getElementById('storeCoinsBalance');
   const fortuneWheel = document.getElementById('fortuneWheel');
@@ -20,31 +18,7 @@ function initFortuneWheel() {
   const fortuneAdminPanel = document.getElementById('fortuneAdminPanel');
   const resetFortuneButton = document.getElementById('resetFortuneButton');
   const simulateTenButton = document.getElementById('simulateTenButton');
-  const dailySpinLimit = 10;
-
-  function autoResetAllFortune() {
-    const users = getAllFortuneUsers();
-    const currentUser = localStorage.getItem('writer_user');
-    const todayKey = getTodayKey();
-
-    users.forEach((user) => {
-      setCurrentUser(user);
-      localStorage.setItem('fortuneCoins', '0');
-      localStorage.setItem('fortuneLastSpin', '');
-      localStorage.setItem('fortuneExtraSpin', 'false');
-      localStorage.setItem('fortuneCurrentTask', 'null');
-      localStorage.setItem('fortunePurchases', JSON.stringify({}));
-      localStorage.setItem('fortuneHistory', JSON.stringify([]));
-      localStorage.setItem('fortuneSpinDay', todayKey);
-      localStorage.setItem('fortuneSpinsToday', '0');
-    });
-
-    if (currentUser) {
-      setCurrentUser(currentUser);
-    } else {
-      logoutCurrentUser();
-    }
-  }
+  const dailySpinLimit = 2;
 
   const categories = [
     {
@@ -95,16 +69,72 @@ function initFortuneWheel() {
     }
   ];
 
-  const storeItems = [
-    { id: 'candy', icon: '🍫', title: 'Конфета', cost: 20, desc: 'Маленькая сладкая мотивация.' },
-    { id: 'coffee', icon: '☕', title: 'Любимый кофе', cost: 50, desc: 'Бодрит пишущего автора.' },
-    { id: 'dessert', icon: '🍰', title: 'Десерт', cost: 80, desc: 'Награда за упорный текстовый марафон.' },
-    { id: 'book', icon: '📖', title: 'Новая книга', cost: 250, desc: 'Большой подарок для творческой души.' },
-    { id: 'game', icon: '🎮', title: 'Игра или крупная покупка', cost: 500, desc: 'Реальная награда за серьёзный прогресс.' },
-    { id: 'trinket', icon: '⚔️', title: 'Ещё одна фишка', cost: 350, desc: 'Особый бонус для авторского настроения.' }
+  const riskyTasks = [
+    { id: '150-words-risky', name: 'Написать 150 слов', coins: 12, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: '150-words' },
+    { id: '400-words-risky', name: 'Написать 400 слов', coins: 25, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: '400-words' },
+    { id: '15-minutes-risky', name: 'Писать 15 минут без остановки', coins: 20, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: '15-minutes' },
+    { id: '25-minutes-no-tabs-risky', name: 'Писать 25 минут без переключения вкладок', coins: 30, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: '25-minutes-no-tabs' },
+    { id: 'finish-fragment-risky', name: 'Дописать начатый фрагмент (без редактирования)', coins: 40, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'finish-fragment' },
+    { id: '20-percent-more-risky', name: 'Написать на 20% больше, чем в последнюю сессию', coins: 50, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: '20-percent-more' },
+    { id: 'keep-streak-and-goal-risky', name: 'Сохранить серию + выполнить цель дня', coins: 60, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'keep-streak-and-goal' },
+    { id: 'finish-scene-one-go-risky', name: 'Завершить сцену за один заход', coins: 75, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'finish-scene-one-go' },
+    { id: 'beat-yesterday-1-2-risky', name: 'Побить вчерашний результат ×1.2', coins: 90, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'beat-yesterday-1-2' },
+    { id: 'beat-week-risky', name: 'Побить лучший результат недели', coins: 120, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'beat-week' },
+    { id: 'new-time-record-plus-risky', name: 'Новый рекорд по времени сессии + минимум сцена', coins: 150, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'new-time-record-plus' },
+    { id: 'new-word-record-plus-risky', name: 'Новый рекорд по словам + без пауз', coins: 180, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'new-word-record-plus' },
+    { id: 'finish-chapter-day-risky', name: 'Завершить главу за один день', coins: 220, desc: 'Рискованная версия: награда будет удвоена если вы выполните задание идеально.', rarity: 'Рискованное', baseId: 'finish-chapter-day' },
+    { id: 'extra-spin-risky', name: 'Получить ещё одно вращение колеса (только за ×2 цель)', coins: 0, desc: 'Дополнительная возможность при выполнении рискованной цели.', rarity: 'Рискованное', baseId: 'extra-spin' }
   ];
 
-  autoResetAllFortune();
+  const storeItems = [
+    // Маленькие награды 5–30
+    { id: 'eat-candy', icon: '🍬', title: 'Съесть конфету', cost: 20, desc: 'Небольшая сладкая награда за прогресс.' },
+    { id: 'chewing-gum', icon: '🍭', title: 'Жвачка / сладость', cost: 10, desc: 'Быстрая маленькая радость.' },
+    { id: 'fav-drink-home', icon: '🥤', title: 'Пить любимый напиток', cost: 15, desc: 'Маленький перерыв с любимым напитком.' },
+    { id: 'buy-bar', icon: '🍫', title: 'Купить батончик', cost: 25, desc: 'Небольшой снэк в магазине.' },
+    { id: 'make-tea-coffee', icon: '☕', title: 'Сделать чай/кофе дома', cost: 10, desc: 'Приятный горячий напиток своими руками.' },
+    { id: 'eat-sweet', icon: '🍰', title: 'Съесть что-то сладкое', cost: 25, desc: 'Большая сладкая награда.' },
+    { id: 'chew-snacks', icon: '🍿', title: 'Пожевать снеки', cost: 20, desc: 'Лёгкий перекус во время работы.' },
+    { id: 'salty-snack', icon: '🥨', title: 'Перекусить чем-то солёным', cost: 20, desc: 'Солёный маленький бонус.' },
+    { id: 'drink-juice', icon: '🧃', title: 'Выпить сок', cost: 15, desc: 'Освежающий сок как награда.' },
+
+    // Обычные награды 30–80
+    { id: 'store-coffee', icon: '☕', title: 'Кофе/энергетик в магазине', cost: 50, desc: 'Кофе для энергии вне дома.' },
+    { id: 'eat-dessert', icon: '🍮', title: 'Съесть десерт', cost: 80, desc: 'Серьёзная сладкая награда.' },
+    { id: 'go-buy-tasty', icon: '🛍️', title: 'Выйти в магазин за вкусным', cost: 60, desc: 'Короткая вылазка за лакомством.' },
+    { id: 'walk-15-30', icon: '🚶', title: 'Прогулка 15–30 минут', cost: 60, desc: 'Свежий воздух и заряд энергии.' },
+    { id: 'read-time', icon: '📚', title: 'Почитать', cost: 70, desc: 'Тихое чтение как награда.' },
+    { id: 'small-shop-buy', icon: '🛒', title: 'Купить что-то маленькое', cost: 80, desc: 'Маленькая покупка в магазине.' },
+
+    // Средние награды 90–200
+    { id: 'order-delivery', icon: '🍱', title: 'Заказать доставку еды', cost: 200, desc: 'Большая еда через доставку.' },
+    { id: 'visit-cafe', icon: '☕', title: 'Сходить в кафе', cost: 150, desc: 'Маленький выход в кафе.' },
+    { id: 'buy-dessert-cafe', icon: '🧁', title: 'Купить десерт в кафе', cost: 130, desc: 'Десерт в уютном месте.' },
+    { id: 'movie-night', icon: '🎬', title: 'Кино вечер', cost: 120, desc: 'Кино дома или в кинотеатре.' },
+    { id: 'mall-trip', icon: '🏬', title: 'Сходить в торговый центр', cost: 140, desc: 'Гулять и выбирать мелочи.' },
+    { id: 'buy-book', icon: '📖', title: 'Купить книгу', cost: 200, desc: 'Новая книга для вдохновения.' },
+    { id: 'order-drink-food', icon: '🍔', title: 'Заказать напиток + еду', cost: 180, desc: 'Комбо на выходной.' },
+    { id: 'play-game', icon: '🎮', title: 'Поиграть', cost: 140, desc: 'Игровой вечер как награда.' },
+    { id: 'visit-new-spot', icon: '📍', title: 'Сходить в новую точку', cost: 150, desc: 'Исследовать новое кафе или точку.' },
+
+    // Крупные награды 200–500
+    { id: 'hobby-purchase', icon: '🛍️', title: 'Крупная покупка для хобби', cost: 300, desc: 'Серьёзная покупка для хобби.' },
+    { id: 'long-wanted-gift', icon: '🎁', title: 'Подарок себе “давно хотел(а)”', cost: 350, desc: 'Особенный подарок.' },
+    { id: 'cafe-movie-walk', icon: '☕🎬🚶', title: 'Кафе + кино + прогулка', cost: 250, desc: 'Большой развлекательный день.' },
+    { id: 'go-to-cinema', icon: '🍿', title: 'Сходить в кино', cost: 220, desc: 'Поход в кинотеатр.' },
+
+    // Редкие крупные 500+
+    { id: 'big-gift', icon: '🎉', title: 'Большой подарок себе', cost: 550, desc: 'Праздничный масштаб для себя.' },
+    { id: 'creative-large-purchase', icon: '🖌️', title: 'Крупная покупка для творчества', cost: 650, desc: 'Инструменты и материалы для творчества.' },
+    { id: 'dream-big-purchase', icon: '🏆', title: 'Большая покупка мечты', cost: 1000, desc: 'Крупная цель-накопление.' },
+
+    // Добавки
+    { id: 'notebook', icon: '📓', title: 'Купить новый блокнот', cost: 60, desc: 'Новый блокнот для заметок и идей.' },
+    { id: 'pen', icon: '🖊️', title: 'Купить ручку/маркер', cost: 40, desc: 'Инструменты для ведения записей.' },
+    { id: 'stickers', icon: '🏷️', title: 'Купить стикеры', cost: 50, desc: 'Весёлые стикеры для мотивации.' },
+    { id: 'try-new-drink', icon: '🧋', title: 'Попробовать новый напиток', cost: 80, desc: 'Новый необычный напиток.' },
+    { id: 'mood-sweet', icon: '🍫', title: 'Купить сладость “по настроению”', cost: 25, desc: 'Небольшой подарок себе.' }
+  ];
 
   const state = {
     coins: Number(localStorage.getItem('fortuneCoins')) || 0,
@@ -115,6 +145,7 @@ function initFortuneWheel() {
     history: JSON.parse(localStorage.getItem('fortuneHistory') || '[]'),
     spinDay: localStorage.getItem('fortuneSpinDay') || null,
     spinsToday: Number(localStorage.getItem('fortuneSpinsToday') || 0),
+    riskyModeActive: JSON.parse(localStorage.getItem('fortuneRiskyMode') || 'false'),
     spinInProgress: false
   };
 
@@ -145,6 +176,7 @@ function initFortuneWheel() {
     localStorage.setItem('fortuneHistory', JSON.stringify(state.history));
     localStorage.setItem('fortuneSpinDay', state.spinDay || '');
     localStorage.setItem('fortuneSpinsToday', String(state.spinsToday));
+    localStorage.setItem('fortuneRiskyMode', JSON.stringify(state.riskyModeActive));
   }
 
   function chooseOutcome() {
@@ -204,7 +236,6 @@ function initFortuneWheel() {
       taskCoins.textContent = '—';
       taskMessage.textContent = 'Здесь появится выбранное задание. Его можно будет выполнить и получить монеты прямо на странице.';
       taskActions.innerHTML = '';
-      riskChoice.hidden = true;
       return;
     }
 
@@ -216,7 +247,6 @@ function initFortuneWheel() {
 
     if (state.currentTask.completed) {
       taskActions.innerHTML = '<div class="task-completed">Задание выполнено.</div>';
-      riskChoice.hidden = true;
       return;
     }
 
@@ -228,12 +258,7 @@ function initFortuneWheel() {
     taskActions.appendChild(completeButton);
 
     if (state.currentTask.coins > 0 && state.currentTask.id !== 'extra-spin') {
-      riskChoice.hidden = false;
       state.currentTask.mode = state.currentTask.mode || 'safe';
-      safeMode.classList.toggle('active', state.currentTask.mode === 'safe');
-      riskyMode.classList.toggle('active', state.currentTask.mode === 'risky');
-    } else {
-      riskChoice.hidden = true;
     }
   }
 
@@ -283,6 +308,7 @@ function initFortuneWheel() {
     updateWheelLabel();
     spinButton.disabled = state.spinInProgress || (!canSpin() && !state.extraSpin);
     spinAgainButton.disabled = state.spinInProgress;
+    if (riskyModeToggle) riskyModeToggle.classList.toggle('active', state.riskyModeActive);
   }
 
   function getAllFortuneUsers() {
@@ -315,6 +341,9 @@ function initFortuneWheel() {
     const currentUser = localStorage.getItem('writer_user');
     const todayKey = getTodayKey();
 
+    // Установим у всех пользователей 0 монет и 2 доступные крутки.
+    // Для dailySpinLimit=10 это означает, что spinsToday = 8 (использовано), остаётся 2.
+    const usedSpins = Math.max(0, dailySpinLimit - 2);
     users.forEach((user) => {
       setCurrentUser(user);
       localStorage.setItem('fortuneCoins', '0');
@@ -324,7 +353,8 @@ function initFortuneWheel() {
       localStorage.setItem('fortunePurchases', JSON.stringify({}));
       localStorage.setItem('fortuneHistory', JSON.stringify([]));
       localStorage.setItem('fortuneSpinDay', todayKey);
-      localStorage.setItem('fortuneSpinsToday', '0');
+      localStorage.setItem('fortuneSpinsToday', String(usedSpins));
+      localStorage.setItem('fortuneRiskyMode', JSON.stringify(false));
     });
 
     if (currentUser) {
@@ -340,10 +370,11 @@ function initFortuneWheel() {
     state.purchases = {};
     state.history = [];
     state.spinDay = todayKey;
-    state.spinsToday = 0;
+    state.spinsToday = Math.max(0, dailySpinLimit - 2);
+    state.riskyModeActive = false;
     saveState();
     updateUI();
-    alert('У всех пользователей теперь 0 монет и 10 доступных круток.');
+    alert('У всех пользователей теперь 0 монет и 2 доступных крутки.');
   }
 
   function simulateSpins(count) {
@@ -400,7 +431,7 @@ function initFortuneWheel() {
     state.currentTask = {
       ...outcome,
       completed: false,
-      mode: 'safe',
+      mode: state.riskyModeActive ? 'risky' : 'safe',
       assignedAt: new Date().toISOString()
     };
     if (outcome.id === 'extra-spin') {
@@ -465,19 +496,15 @@ function initFortuneWheel() {
     updateUI();
   }
 
-  safeMode.addEventListener('click', () => {
-    if (!state.currentTask || state.currentTask.completed) return;
-    state.currentTask.mode = 'safe';
-    saveState();
-    renderTask();
-  });
-
-  riskyMode.addEventListener('click', () => {
-    if (!state.currentTask || state.currentTask.completed) return;
-    state.currentTask.mode = 'risky';
-    saveState();
-    renderTask();
-  });
+  // Тумблер для включения глобального рискованного режима перед круткой
+  if (riskyModeToggle) {
+    riskyModeToggle.classList.toggle('active', state.riskyModeActive);
+    riskyModeToggle.addEventListener('click', () => {
+      state.riskyModeActive = !state.riskyModeActive;
+      riskyModeToggle.classList.toggle('active', state.riskyModeActive);
+      saveState();
+    });
+  }
 
   spinButton.addEventListener('click', () => spinWheel(false));
   spinAgainButton.addEventListener('click', () => spinWheel(false));
