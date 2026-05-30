@@ -69,6 +69,12 @@ input, textarea, select { width: 100%; }
   max-width: 280px;
 }
 
+.effect-page {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+}
+
 .effect-grid {
   grid-template-columns: 1fr !important;
 }
@@ -83,6 +89,65 @@ input, textarea, select { width: 100%; }
 
 .effect-toolbar {
   justify-content: flex-start;
+  overflow-x: auto;
+}
+
+.effect-toolbar .format-btn {
+  min-width: 48px;
+  flex: 0 0 auto;
+}
+
+.focus-textarea {
+  min-height: 220px;
+}
+
+.achievements-panel {
+  width: auto !important;
+  max-width: calc(100% - 24px) !important;
+  padding: 24px !important;
+  border-radius: 28px !important;
+}
+
+.achievement-grid {
+  gap: 16px !important;
+}
+
+.fortune-page {
+  padding: 20px 0 32px !important;
+}
+
+.fortune-top {
+  grid-template-columns: 1fr !important;
+}
+
+.fortune-wheel-frame {
+  min-height: 280px !important;
+}
+
+.store-grid {
+  grid-template-columns: 1fr !important;
+}
+
+.fortune-panel {
+  padding: 20px !important;
+}
+
+.fortune-task-head {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.achievement-badge {
+  padding: 18px 16px !important;
+}
+
+.achievement-badge .achievement-title {
+  grid-template-columns: auto 1fr auto !important;
+  gap: 10px;
+}
+
+.achievement-badge .achievement-percent {
+  white-space: nowrap;
 }
 
 /* Prevent overlapping in writing-calendar on mobile */

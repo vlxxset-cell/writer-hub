@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Колесо фортуны</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 768px)">
+  <script src="user-storage.js"></script>
+  <script src="theme.js" defer></script>
+  <script src="wheel.js" defer></script>
+  <script src="transition.js" defer></script>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle">🌙</button>
+
+  <div class="page-header">
+    <div>
+      <h1>🎡 Колесо фортуны</h1>
+      <p class="subtitle">Одно вращение в день — стильные задания, усиленный азарт и магазин монет.</p>
+    </div>
+    <div class="page-actions">
+      <a class="card small-card" href="index.html">← главное</a>
+    </div>
+  </div>
+
+  <main class="fortune-page">
+    <section class="fortune-top">
+      <div class="fortune-panel fortune-summary">
+        <div class="fortune-balance">
+          <div class="fortune-balance-label">Баланс монет</div>
+          <div class="fortune-coins" id="coinsBalance">0</div>
+        </div>
+        <div class="fortune-status">
+          <div id="spinNote" class="fortune-note">Здесь появится информация о доступных вращениях.</div>
+          <button id="spinButton" class="open-btn" type="button">Крутить колесо</button>
+          <button id="spinAgainButton" class="edit-btn" type="button" style="display:none;">Использовать доп. вращение</button>
+          <div id="spinHint" class="fortune-subtext">Вращение доступно один раз в день, до получения дополнительного.</div>
+        </div>
+        <div class="fortune-summary-footer">
+          <div>Последнее вращение: <strong id="lastSpinDate">—</strong></div>
+          <div>Вращений сегодня: <strong id="spinsToday">0</strong></div>
+        </div>
+      </div>
+
+      <div class="fortune-panel fortune-wheel-card">
+        <div class="fortune-wheel-frame" aria-hidden="true">
+          <div class="fortune-wheel" id="fortuneWheel"></div>
+          <div class="wheel-pointer" aria-label="Указатель колеса"></div>
+        </div>
+        <div class="wheel-legend">
+          <span class="rarity common">🟢 Обычное</span>
+          <span class="rarity uncommon">🔵 Необычное</span>
+          <span class="rarity rare">🟣 Редкое</span>
+          <span class="rarity legendary">🟡 Легендарное</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="fortune-panel fortune-task-card">
+      <div class="fortune-task-head">
+        <div>
+          <h2>Текущее задание</h2>
+          <p id="taskRarity" class="subtitle">Поверните колесо, чтобы получить задание.</p>
+        </div>
+        <div id="taskCoins" class="task-coins">—</div>
+      </div>
+      <div id="taskMessage" class="fortune-task-message">Выберите задание и отмечайте выполнение прямо на этой странице.</div>
+      <div id="taskActions" class="fortune-task-actions"></div>
+      <div id="riskChoice" class="fortune-risk-box" hidden>
+        <p>Выберите режим для сложного задания:</p>
+        <button id="safeMode" class="open-btn" type="button">Обычный режим</button>
+        <button id="riskyMode" class="delete-btn" type="button">Рискованный режим</button>
+      </div>
+    </section>
+
+    <section class="fortune-panel fortune-store">
+      <div class="store-header">
+        <div>
+          <h2>Магазин наград</h2>
+          <p class="subtitle">Трать монеты на небольшие бонусы или крупные подарки.</p>
+        </div>
+        <div class="store-balance">Ваши покупки сохраняются автоматически.</div>
+      </div>
+      <div class="store-grid" id="storeGrid"></div>
+    </section>
+  </main>
+</body>
+</html>
