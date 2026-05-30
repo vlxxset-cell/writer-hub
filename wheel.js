@@ -526,7 +526,12 @@ function safeInit() {
     initFortuneWheel();
   } catch (error) {
     console.error('Ошибка инициализации колеса фортуны:', error);
-    alert('Ошибка загрузки страницы колеса фортуны. Откройте консоль для подробностей.');
+    try {
+      const shortStack = (error && error.stack) ? error.stack.split('\n').slice(0,4).join('\n') : String(error);
+      alert(`Ошибка загрузки страницы колеса фортуны:\n${error.message || error}\n\nСтек (первые строки):\n${shortStack}`);
+    } catch (e) {
+      alert('Ошибка загрузки страницы колеса фортуны. Откройте консоль для подробностей.');
+    }
   }
 }
 
