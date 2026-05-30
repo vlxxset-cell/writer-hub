@@ -41,7 +41,7 @@
           </div>
           <button id="spinButton" class="open-btn" type="button">Крутить колесо</button>
           <button id="spinAgainButton" class="edit-btn" type="button" style="display:none;">Использовать доп. вращение</button>
-          <div id="spinHint" class="fortune-subtext">Доступно до 10 круток в день. При бонусе — ещё одно.</div>
+          <div id="spinHint" class="fortune-subtext">Доступно до 2 круток в день. При бонусе — ещё одно.</div>
         </div>
         <div class="fortune-summary-footer">
           <div>Последнее вращение: <strong id="lastSpinDate">—</strong></div>
@@ -102,5 +102,15 @@
       </div>
     </section>
   </main>
-</body>
+
+    <div id="storeModal" class="modal" aria-hidden="true" tabindex="-1">
+      <div class="modal-card">
+        <h2 id="storeModalTitle">Внимание</h2>
+        <p id="storeModalText">Здесь появится сообщение.</p>
+        <div class="modal-buttons">
+          <button id="storeModalClose" type="button">Хорошо</button>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

@@ -18,6 +18,10 @@ function initFortuneWheel() {
   const fortuneAdminPanel = document.getElementById('fortuneAdminPanel');
   const resetFortuneButton = document.getElementById('resetFortuneButton');
   const simulateTenButton = document.getElementById('simulateTenButton');
+  const storeModal = document.getElementById('storeModal');
+  const storeModalTitle = document.getElementById('storeModalTitle');
+  const storeModalText = document.getElementById('storeModalText');
+  const storeModalClose = document.getElementById('storeModalClose');
   const dailySpinLimit = 2;
 
   const requiredElements = {
@@ -112,6 +116,8 @@ function initFortuneWheel() {
   ];
 
   const storeItems = [
+    // Дополнительное вращение
+    { id: 'buy-extra-spin', icon: '🎟️', title: 'Купить доп. вращение', cost: 10, desc: 'Дополнительное вращение станет доступно после того, как вы используете обычные крутки.' },
     // Маленькие награды 5–30
     { id: 'eat-candy', icon: '🍬', title: 'Съесть конфету', cost: 20, desc: 'Небольшая сладкая награда за прогресс.' },
     { id: 'chewing-gum', icon: '🍭', title: 'Жвачка / сладость', cost: 10, desc: 'Быстрая маленькая радость.' },
@@ -192,6 +198,29 @@ function initFortuneWheel() {
     return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
   }
 
+  function normalizeSpinState() {
+    const today = getTodayKey();
+    let shouldSave = false;
+
+    if (!isSameDay(state.spinDay, today)) {
+      state.spinDay = today;
+      state.spinsToday = 0;
+      state.extraSpin = false;
+      shouldSave = true;
+    }
+    if (state.spinsToday < 0) {
+      state.spinsToday = 0;
+      shouldSave = true;
+    }
+    if (state.spinsToday > dailySpinLimit) {
+      state.spinsToday = dailySpinLimit;
+      shouldSave = true;
+    }
+    if (shouldSave) {
+      saveState();
+    }
+  }
+
   function saveState() {
     localStorage.setItem('fortuneCoins', String(state.coins));
     localStorage.setItem('fortuneLastSpin', state.lastSpin || '');
@@ -223,23 +252,27 @@ function initFortuneWheel() {
     if (!sameDay) {
       state.spinDay = today;
       state.spinsToday = 0;
+      state.extraSpin = false;
       saveState();
     }
 
     const remaining = Math.max(0, dailySpinLimit - state.spinsToday);
-    const hasBonus = state.extraSpin;
+    const hasBonus = Boolean(state.extraSpin);
+    const bonusSuffix = hasBonus ? ' + бонус' : '';
+
     if (state.spinInProgress) {
       spinNote.textContent = 'Колесо вращается... Ждите результата.';
       spinButton.disabled = true;
       spinAgainButton.disabled = true;
       spinAgainButton.style.display = 'none';
     } else if (remaining > 0) {
-      spinNote.textContent = `Доступно ${remaining} из ${dailySpinLimit} круток сегодня.`;
+      spinNote.textContent = `Доступно ${remaining} из ${dailySpinLimit} круток сегодня.` +
+        (hasBonus ? ' После них будет доступно бонусное вращение.' : '');
       spinButton.disabled = false;
       spinAgainButton.style.display = 'none';
     } else if (hasBonus) {
-      spinNote.textContent = `Все ${dailySpinLimit} круток выполнены, но есть бонусное вращение.`;
-      spinButton.disabled = true;
+      spinNote.textContent = `Все ${dailySpinLimit} круток сегодня использованы. Используйте бонусное вращение или купите новое в магазине.`;
+      spinButton.disabled = false;
       spinAgainButton.style.display = 'inline-flex';
     } else {
       spinNote.textContent = `Все ${dailySpinLimit} круток сегодня использованы.`;
@@ -248,7 +281,7 @@ function initFortuneWheel() {
     }
 
     lastSpinDateEl.textContent = formatDate(state.lastSpin);
-    spinsTodayEl.textContent = `${state.spinsToday}/${dailySpinLimit}${hasBonus ? ' + бонус' : ''}`;
+    spinsTodayEl.textContent = `${state.spinsToday}/${dailySpinLimit}${bonusSuffix}`;
   }
 
   function getRarityClass(rarity) {
@@ -290,7 +323,6 @@ function initFortuneWheel() {
   function renderStore() {
     storeGrid.innerHTML = storeItems.map((item) => {
       const count = Number(state.purchases[item.id] || 0);
-      const affordable = state.coins >= item.cost;
       return `
         <article class="store-card">
           <div class="store-icon">${item.icon}</div>
@@ -300,7 +332,7 @@ function initFortuneWheel() {
           </div>
           <div class="store-action">
             <span class="store-cost">${item.cost} 🪙</span>
-            <button data-id="${item.id}" ${affordable ? '' : 'disabled'} class="open-btn">Купить${count ? ` (${count})` : ''}</button>
+            <button data-id="${item.id}" class="open-btn">Купить${count ? ` (${count})` : ''}</button>
           </div>
         </article>
       `;
@@ -312,6 +344,40 @@ function initFortuneWheel() {
         purchaseItem(itemId);
       });
     });
+  }
+
+  function showStoreModal(title, text, type = 'info') {
+    if (!storeModal || !storeModalTitle || !storeModalText) {
+      alert(text);
+      return;
+    }
+    storeModalTitle.textContent = title;
+    storeModalText.textContent = text;
+    storeModal.classList.remove('info', 'warning', 'success');
+    storeModal.classList.add(type);
+    storeModal.setAttribute('aria-hidden', 'false');
+    storeModal.classList.add('show');
+      try {
+        const modalCard = storeModal.querySelector('.modal-card');
+        if (modalCard && modalCard.scrollIntoView) {
+          modalCard.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: window.scrollY, behavior: 'auto' });
+        }
+      } catch (e) {
+        // ignore scroll errors
+      }
+      try {
+        storeModal.focus();
+      } catch (e) {
+        // ignore focus error
+      }
+  }
+
+  function hideStoreModal() {
+    if (!storeModal) return;
+    storeModal.classList.remove('show', 'info', 'warning', 'success');
+    storeModal.setAttribute('aria-hidden', 'true');
   }
 
   function updateWheelLabel() {
@@ -367,7 +433,7 @@ function initFortuneWheel() {
     const todayKey = getTodayKey();
 
     // Установим у всех пользователей 0 монет и 2 доступные крутки.
-    // Для dailySpinLimit=10 это означает, что spinsToday = 8 (использовано), остаётся 2.
+    // Для dailySpinLimit=2 это означает, что spinsToday = 0 (использовано), остаётся 2.
     const usedSpins = Math.max(0, dailySpinLimit - 2);
     users.forEach((user) => {
       setCurrentUser(user);
@@ -467,15 +533,41 @@ function initFortuneWheel() {
     renderTask();
   }
 
-  function spinWheel() {
-    if (state.spinInProgress || !canSpin()) return;
-    state.spinInProgress = true;
-    updateUI();
-    const outcome = chooseOutcome();
+  // mode: 'normal' - triggered from main spin button
+  //       'extra'  - triggered from "use extra spin" button
+  //       'auto'   - preserve previous behavior
+  function spinWheel(mode = 'auto') {
+    if (state.spinInProgress) return;
+
     const today = getTodayKey();
     const sameDay = isSameDay(state.spinDay, today);
     const remaining = sameDay ? Math.max(0, dailySpinLimit - state.spinsToday) : dailySpinLimit;
-    const useExtra = remaining <= 0 && state.extraSpin;
+
+    // Prevent normal button from consuming an extra spin
+    if (mode === 'normal' && remaining <= 0) {
+      showStoreModal(
+        'Все вращения использованы',
+        'Все вращения за сегодня уже были использованы. Используйте бонусные вращения, если они доступны, или купите новые в магазине.',
+        'warning'
+      );
+      return;
+    }
+
+    // Extra spin must be explicitly used via extra button
+    if (mode === 'extra' && !state.extraSpin) {
+      showStoreModal('Нет бонусного вращения', 'У вас нет доступного бонусного вращения.', 'warning');
+      return;
+    }
+
+    // If auto mode, respect canSpin() as before
+    if (mode === 'auto' && !canSpin()) return;
+
+    // If we reach here and remaining == 0 but extraSpin exists, use extra
+    const useExtra = (remaining <= 0 && state.extraSpin) || mode === 'extra';
+
+    state.spinInProgress = true;
+    updateUI();
+    const outcome = chooseOutcome();
     const rotation = 360 * 6 + Math.random() * 360;
     fortuneWheel.style.transition = 'transform 3.5s cubic-bezier(0.33, 1, 0.68, 1)';
     fortuneWheel.style.transform = `rotate(${rotation}deg)`;
@@ -514,11 +606,46 @@ function initFortuneWheel() {
 
   function purchaseItem(itemId) {
     const item = storeItems.find((entry) => entry.id === itemId);
-    if (!item || state.coins < item.cost) return;
+    if (!item) return;
+    if (state.coins < item.cost) {
+      showStoreModal(
+        'Недостаточно монет',
+        'К сожалению, на вашем счету недостаточно монет. Вы можете докупить крутки, чтобы их заработать.',
+        'warning'
+      );
+      return;
+    }
+
+    if (item.id === 'buy-extra-spin') {
+      if (state.extraSpin) {
+        showStoreModal(
+          'Уже есть дополнительное вращение',
+          'У вас уже есть дополнительное вращение. Используйте его прежде чем покупать новое.',
+          'warning'
+        );
+        return;
+      }
+      state.extraSpin = true;
+      showStoreModal(
+        'Дополнительное вращение куплено',
+        'Вы приобрели дополнительное вращение. Оно будет доступно после очередного окончания обычных круток.',
+        'success'
+      );
+    }
+
     state.coins -= item.cost;
     state.purchases[itemId] = Number(state.purchases[itemId] || 0) + 1;
     saveState();
     updateUI();
+
+    // Показываем подтверждение покупки для всех товаров (кроме случаев с предупреждением выше)
+    if (item.id !== 'buy-extra-spin') {
+      showStoreModal(
+        'Покупка выполнена',
+        `Вы успешно приобрели: ${item.title}`,
+        'success'
+      );
+    }
   }
 
   // Тумблер для включения глобального рискованного режима перед круткой
@@ -531,18 +658,45 @@ function initFortuneWheel() {
     });
   }
 
-  spinButton.addEventListener('click', () => spinWheel(false));
-  spinAgainButton.addEventListener('click', () => spinWheel(false));
+  if (spinButton) {
+    spinButton.addEventListener('click', () => {
+      spinWheel('normal');
+    });
+  } else {
+    console.warn('wheel.js: missing spinButton');
+  }
+
+  if (spinAgainButton) {
+    spinAgainButton.addEventListener('click', () => spinWheel('extra'));
+  } else {
+    console.warn('wheel.js: missing spinAgainButton');
+  }
 
   if (fortuneAdminPanel) {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('admin') === '1') {
       fortuneAdminPanel.hidden = false;
-      resetFortuneButton.addEventListener('click', resetFortuneData);
-      simulateTenButton.addEventListener('click', () => simulateSpins(10));
+      if (resetFortuneButton) {
+        resetFortuneButton.addEventListener('click', resetFortuneData);
+      }
+      if (simulateTenButton) {
+        simulateTenButton.addEventListener('click', () => simulateSpins(10));
+      }
     }
   }
 
+  if (storeModalClose) {
+    storeModalClose.addEventListener('click', hideStoreModal);
+  }
+  if (storeModal) {
+    storeModal.addEventListener('click', (event) => {
+      if (event.target === storeModal) {
+        hideStoreModal();
+      }
+    });
+  }
+
+  normalizeSpinState();
   updateUI();
 }
 
