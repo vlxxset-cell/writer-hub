@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+function initFortuneWheel() {
   const coinsBalance = document.getElementById('coinsBalance');
   const spinNote = document.getElementById('spinNote');
   const spinButton = document.getElementById('spinButton');
@@ -23,28 +23,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const dailySpinLimit = 10;
 
   function autoResetAllFortune() {
-    if (localStorage.getItem('fortuneAutoResetDone') === '1') return;
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    const users = getAllFortuneUsers();
     const currentUser = localStorage.getItem('writer_user');
-    Object.keys(users).forEach((user) => {
-      localStorage.setItem('writer_user', user);
-      [
-        'fortuneCoins',
-        'fortuneLastSpin',
-        'fortuneExtraSpin',
-        'fortuneCurrentTask',
-        'fortunePurchases',
-        'fortuneHistory',
-        'fortuneSpinDay',
-        'fortuneSpinsToday'
-      ].forEach((key) => localStorage.removeItem(key));
+    const todayKey = getTodayKey();
+
+    users.forEach((user) => {
+      setCurrentUser(user);
+      localStorage.setItem('fortuneCoins', '0');
+      localStorage.setItem('fortuneLastSpin', '');
+      localStorage.setItem('fortuneExtraSpin', 'false');
+      localStorage.setItem('fortuneCurrentTask', 'null');
+      localStorage.setItem('fortunePurchases', JSON.stringify({}));
+      localStorage.setItem('fortuneHistory', JSON.stringify([]));
+      localStorage.setItem('fortuneSpinDay', todayKey);
+      localStorage.setItem('fortuneSpinsToday', '0');
     });
+
     if (currentUser) {
-      localStorage.setItem('writer_user', currentUser);
+      setCurrentUser(currentUser);
     } else {
-      localStorage.removeItem('writer_user');
+      logoutCurrentUser();
     }
-    localStorage.setItem('fortuneAutoResetDone', '1');
   }
 
   const categories = [
@@ -52,46 +51,46 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 'common',
       label: 'Обычное',
       color: 'common',
-      chance: 69,
+      chance: 45,
       tasks: [
-        { id: '100-words', name: 'Написать 100 слов', coins: 5, desc: 'Небольшой писательский отрезок, чтобы включить процесс.', rarity: 'Обычное' },
-        { id: '300-words', name: 'Написать 300 слов', coins: 10, desc: 'Двигайтесь дальше и наберитесь энергии текста.', rarity: 'Обычное' },
-        { id: '10-minutes', name: 'Писать 10 минут без остановки', coins: 8, desc: 'Проверьте свою концентрацию и скорость.', rarity: 'Обычное' },
-        { id: '20-minutes-no-tabs', name: 'Писать 20 минут без переключения вкладок', coins: 12, desc: 'Фокус с минимальными отвлечениями.', rarity: 'Обычное' },
-        { id: 'finish-fragment', name: 'Дописать начатый фрагмент', coins: 15, desc: 'Завершите начатый кусок текста для ощущения прогресса.', rarity: 'Обычное' }
+        { id: '150-words', name: 'Написать 150 слов', coins: 12, desc: 'Небольшой писательский рывок, чтобы включиться.', rarity: 'Обычное' },
+        { id: '400-words', name: 'Написать 400 слов', coins: 25, desc: 'Поймайте поток и пропишите важный отрывок.', rarity: 'Обычное' },
+        { id: '15-minutes', name: 'Писать 15 минут без остановки', coins: 20, desc: 'Проверьте свою концентрацию и скорость.', rarity: 'Обычное' },
+        { id: '25-minutes-no-tabs', name: 'Писать 25 минут без переключения вкладок', coins: 30, desc: 'Фокус с минимальными отвлечениями.', rarity: 'Обычное' },
+        { id: 'finish-fragment', name: 'Дописать начатый фрагмент (без редактирования)', coins: 40, desc: 'Завершите начатый кусок текста без правок.', rarity: 'Обычное' }
       ]
     },
     {
       id: 'uncommon',
       label: 'Необычное',
       color: 'uncommon',
-      chance: 23,
+      chance: 30,
       tasks: [
-        { id: 'more-than-last', name: 'Написать больше, чем в последнюю сессию', coins: 18, desc: 'Пробейте прошлый результат и добавьте энергию.', rarity: 'Необычное' },
-        { id: 'keep-streak', name: 'Сохранить серию ещё на один день', coins: 20, desc: 'Продлите свою писательскую привычку ещё на один день.', rarity: 'Необычное' },
-        { id: 'finish-scene', name: 'Завершить одну сцену', coins: 25, desc: 'Постройте содержание и завершите целый кусок сюжета.', rarity: 'Необычное' },
-        { id: 'beat-yesterday', name: 'Побить вчерашний результат', coins: 30, desc: 'Перепишите собственный вчерашний рекорд.', rarity: 'Необычное' }
+        { id: '20-percent-more', name: 'Написать на 20% больше, чем в последнюю сессию', coins: 50, desc: 'Побейте свой предыдущий результат на 20%.', rarity: 'Необычное' },
+        { id: 'keep-streak-and-goal', name: 'Сохранить серию + выполнить цель дня', coins: 60, desc: 'Продлите серию и закройте дневную цель.', rarity: 'Необычное' },
+        { id: 'finish-scene-one-go', name: 'Завершить сцену за один заход', coins: 75, desc: 'Создайте завершённую сцену без остановок.', rarity: 'Необычное' }
       ]
     },
     {
       id: 'rare',
       label: 'Редкое',
       color: 'rare',
-      chance: 7,
+      chance: 20,
       tasks: [
-        { id: 'beat-week', name: 'Побить лучший результат недели', coins: 40, desc: 'Установите новый недельный рекорд по письму.', rarity: 'Редкое' },
-        { id: 'new-time-record', name: 'Установить новый рекорд по времени сессии', coins: 50, desc: 'Превзойдите свой самый длинный сеанс письма.', rarity: 'Редкое' },
-        { id: 'new-word-record', name: 'Установить новый рекорд по словам', coins: 60, desc: 'Прокачайте свой максимум по словам в одной сессии.', rarity: 'Редкое' }
+        { id: 'beat-yesterday-1-2', name: 'Побить вчерашний результат ×1.2', coins: 90, desc: 'Увеличьте вчерашний результат минимум на 20%.', rarity: 'Редкое' },
+        { id: 'beat-week', name: 'Побить лучший результат недели', coins: 120, desc: 'Установите новый недельный рекорд по письму.', rarity: 'Редкое' },
+        { id: 'new-time-record-plus', name: 'Новый рекорд по времени сессии + минимум сцена', coins: 150, desc: 'Превзойдите рекорд по времени и напишите сцену.', rarity: 'Редкое' },
+        { id: 'new-word-record-plus', name: 'Новый рекорд по словам + без пауз', coins: 180, desc: 'Поставьте новый рекорд по словам без пауз.', rarity: 'Редкое' }
       ]
     },
     {
       id: 'legendary',
       label: 'Легендарное',
       color: 'legendary',
-      chance: 1,
+      chance: 5,
       tasks: [
-        { id: 'finish-chapter', name: 'Завершить одну главу', coins: 75, desc: 'Большое достижение — закончите целую главу.', rarity: 'Легендарное' },
-        { id: 'extra-spin', name: 'Получить ещё одно вращение колеса', coins: 0, desc: 'Дополнительная возможность крутить колесо сегодня.', rarity: 'Легендарное' }
+        { id: 'finish-chapter-day', name: 'Завершить главу за один день', coins: 220, desc: 'Сделайте большой скачок и завершите главу.', rarity: 'Легендарное' },
+        { id: 'extra-spin', name: 'Получить ещё одно вращение колеса (только за ×2 цель)', coins: 0, desc: 'Дополнительная возможность при выполнении рискованной цели.', rarity: 'Легендарное' }
       ]
     }
   ];
@@ -167,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!sameDay) {
       state.spinDay = today;
       state.spinsToday = 0;
+      saveState();
     }
 
     const remaining = Math.max(0, dailySpinLimit - state.spinsToday);
@@ -285,31 +285,69 @@ document.addEventListener('DOMContentLoaded', () => {
     spinAgainButton.disabled = state.spinInProgress;
   }
 
-  function resetFortuneData() {
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
-    const currentUser = localStorage.getItem('writer_user');
-    Object.keys(users).forEach((user) => {
-      localStorage.setItem('writer_user', user);
-      ['fortuneCoins', 'fortuneLastSpin', 'fortuneExtraSpin', 'fortuneCurrentTask', 'fortunePurchases', 'fortuneHistory', 'fortuneSpinDay', 'fortuneSpinsToday'].forEach((key) => localStorage.removeItem(key));
-    });
-    if (currentUser) {
-      localStorage.setItem('writer_user', currentUser);
-    } else {
-      localStorage.removeItem('writer_user');
+  function getAllFortuneUsers() {
+    const users = new Set();
+    try {
+      const storedUsers = JSON.parse(localStorage.getItem('users') || '{}');
+      if (storedUsers && typeof storedUsers === 'object') {
+        Object.keys(storedUsers).forEach((user) => users.add(user));
+      }
+    } catch (error) {
+      // ignore invalid users list
     }
+
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      const match = key.match(/^(.+)::fortune(Coins|LastSpin|ExtraSpin|CurrentTask|Purchases|History|SpinDay|SpinsToday)$/);
+      if (match) {
+        users.add(match[1]);
+      }
+    }
+
+    const currentUser = localStorage.getItem('writer_user');
+    if (currentUser) users.add(currentUser);
+    return Array.from(users);
+  }
+
+  function resetFortuneData() {
+    const users = getAllFortuneUsers();
+    const currentUser = localStorage.getItem('writer_user');
+    const todayKey = getTodayKey();
+
+    users.forEach((user) => {
+      setCurrentUser(user);
+      localStorage.setItem('fortuneCoins', '0');
+      localStorage.setItem('fortuneLastSpin', '');
+      localStorage.setItem('fortuneExtraSpin', 'false');
+      localStorage.setItem('fortuneCurrentTask', 'null');
+      localStorage.setItem('fortunePurchases', JSON.stringify({}));
+      localStorage.setItem('fortuneHistory', JSON.stringify([]));
+      localStorage.setItem('fortuneSpinDay', todayKey);
+      localStorage.setItem('fortuneSpinsToday', '0');
+    });
+
+    if (currentUser) {
+      setCurrentUser(currentUser);
+    } else {
+      logoutCurrentUser();
+    }
+
     state.coins = 0;
     state.lastSpin = null;
     state.extraSpin = false;
     state.currentTask = null;
     state.purchases = {};
     state.history = [];
-    state.spinDay = null;
+    state.spinDay = todayKey;
     state.spinsToday = 0;
+    saveState();
     updateUI();
-    alert('Монеты и крутки обнулены для всех пользователей.');
+    alert('У всех пользователей теперь 0 монет и 10 доступных круток.');
   }
 
   function simulateSpins(count) {
+    const todayKey = getTodayKey();
     const results = [];
     let lastOutcome = null;
     for (let i = 0; i < count; i += 1) {
@@ -327,6 +365,8 @@ document.addEventListener('DOMContentLoaded', () => {
     state.coins = 0;
     state.lastSpin = null;
     state.extraSpin = false;
+    state.spinDay = todayKey;
+    state.spinsToday = 0;
     saveState();
     wheelResult.textContent = `Симуляция ${count} круток`;
     taskMessage.textContent = `Симулировано ${count} круток. Последнее задание: ${state.currentTask.name}`;
@@ -452,4 +492,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   updateUI();
-});
+}
+
+function safeInit() {
+  try {
+    initFortuneWheel();
+  } catch (error) {
+    console.error('Ошибка инициализации колеса фортуны:', error);
+    alert('Ошибка загрузки страницы колеса фортуны. Откройте консоль для подробностей.');
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', safeInit);
+} else {
+  safeInit();
+}
